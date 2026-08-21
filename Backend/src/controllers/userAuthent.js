@@ -68,7 +68,6 @@ const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email }).populate("role");
-     console.log(user.password);
 
     if (!user) {
       throw new Error("Invalid Credentials");

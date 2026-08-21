@@ -8,6 +8,11 @@ const roleSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    
+    description: {
+      type: String,
+      trim: true,
+    },
 
     permissions: [
       {
@@ -27,11 +32,7 @@ const roleSchema = new mongoose.Schema(
         ],
       },
     ],
-
-    description: {
-      type: String,
-      trim: true,
-    },
+  
   },
   {
     timestamps: true,
