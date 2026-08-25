@@ -1,47 +1,31 @@
-const mongoose = require("mongoose");
-const {Schema} = mongoose;
+const mongoose=require("mongoose");
+const {Schema}=mongoose;
 
-const commentSchema = new Schema(
-  {
-    ticket: {
-      type: Schema.Types.ObjectId,
-      ref: "Ticket",
-      required: true,
-    },
-
-    author: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    message: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    type: {
-      type: String,
-      enum: ["comment", "internal_note"],
-      default: "comment",
-    },
-
-    attachment: {
-      url: {
-        type: String,
-        trim: true,
-      },
-
-    fileName: {
-        type: String,
-        trim: true,
-      },
-    },
+const commentSchema=new Schema({
+  ticket:{
+    type:Schema.Types.ObjectId,
+    ref:'ticket'
   },
-  {
-    timestamps: true,
+  author:{
+    type:Schema.Types.ObjectId,
+    ref:'user'
+  },
+  message:{
+    type:String,
+    required:true,
+    trim:true
+  },
+  type:{
+    type:String,
+    enum:["comment","internal_note"],
+    required:true,
+    default:"comment"  
+  },
+  attachment:{
+    type:String,
+    default:null
   }
-);
-const Comment = mongoose.model("Comment", commentSchema);
-module.exports = Comment;
+},{ timestamps:true })
+
+const Comment=new mongoose.model('comment',commentSchema);
+module.exports=Comment;

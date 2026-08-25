@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const {Schema}=mongoose;
 
-const roleSchema = new mongoose.Schema(
+const roleSchema = new Schema(
   {
     roleName: {
       type: String,
@@ -8,31 +9,16 @@ const roleSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    
-    description: {
+    description:{
       type: String,
       trim: true,
     },
-
-    permissions: [
+    permissions:[
       {
-        type: String,
-        enum: [
-          "create_ticket",
-          "view_own_ticket",
-          "view_all_tickets",
-          "update_ticket",
-          "assign_ticket",
-          "delete_ticket",
-          "add_comment",
-          "add_internal_note",
-          "manage_users",
-          "manage_roles",
-          "view_dashboard",
-        ],
-      },
+        type:Schema.Types.ObjectId,
+        ref:'permission'
+     }
     ],
-  
   },
   {
     timestamps: true,

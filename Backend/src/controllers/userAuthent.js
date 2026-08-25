@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Role = require("../models/role");
 
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validate = require("../utils/validator");
@@ -10,40 +11,38 @@ const register = async (req, res) => {
     validate(req.body);
     const { name, email, password } = req.body;
 
-    const customerRole = await Role.findOne({roleName:"customer" });
-
-    if (!customerRole) {
-      return res.status(500).json({
-        message: "Customer role not found",
-      });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role=await Role.findOne({
+      roleName:"Customer"
+    })
+
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: customerRole._id,
+      role:role._id,
+
     });
 
     const token = jwt.sign(
       {
         _id: user._id,
         email: user.email,
-        role: customerRole._id,
+        role:role._id,
       },
       process.env.JWT_KEY,
       {
-        expiresIn: "1h",
+        expiresIn: "3h",
       },
     );
 
     const reply = {
-      name: user.name,
+      name: user.roleName,
       email: user.email,
       _id: user._id,
-      role: customerRole.name,
+      role:role.name,
     };
 
     res.cookie("token", token, { maxAge: 60 * 60 * 1000 });

@@ -33,26 +33,26 @@ const ticketSchema = new Schema(
       default: "Medium",
     },
 
-    status: {
+    status:{
       type: String,
       enum: ["Open", "In Progress", "Waiting", "Resolved", "Closed"],
       default: "Open",
     },
 
-    category: {
+    category:{
       type: String,
       required: true,
       trim: true,
     },
 
-    attachments: [
+    attachments:[
       {
-        url: {
+        url:{
           type: String,
           trim: true,
         },
 
-        fileName: {
+        fileName:{
           type: String,
           trim: true,
         },
@@ -60,7 +60,7 @@ const ticketSchema = new Schema(
     ],
   },
   {
-    timestamps: true,
+    timestamps:true,
   }
 );
 

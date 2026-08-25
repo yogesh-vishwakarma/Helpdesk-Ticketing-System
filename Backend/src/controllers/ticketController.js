@@ -1,4 +1,7 @@
+const User=require("../models/user");
 const Ticket = require("../models/ticket");
+const Activity=require("../models/activity");
+
 
 const createTicket = async (req, res) => {
   try {
@@ -19,10 +22,19 @@ const createTicket = async (req, res) => {
       attachments: attachments || [],
     });
 
-    return res.status(201).json({
+
+    const active=await Activity.create({
+      ticket:ticket._id,
+      performedBy:req.result._id,
+      action:"Ticket_Created",
+      details:"Ticket created"
+    })
+
+   return res.status(201).json({
       message: "Ticket created successfully",
       ticket,
-    });
+   });
+
   } catch (err) {
     return res.status(500).json({
       message: err.message,
@@ -77,9 +89,7 @@ const getTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
-
     const { title, description, priority, status, category } = req.body;
-
     const ticket = await Ticket.findById(ticketId);
 
     if (!ticket) {
@@ -87,6 +97,9 @@ const updateTicket = async (req, res) => {
         message: "Ticket not found",
       });
     }
+
+    const oldStatus=ticket.status;
+    const oldPriority=ticket.priority;
 
     if (title !== undefined) {
       ticket.title = title;
@@ -110,6 +123,24 @@ const updateTicket = async (req, res) => {
 
     await ticket.save();
 
+    if(status!==undefined && oldStatus!==status){
+      await Activity.create({
+        ticket:ticket._id,
+        perfomedBy:req.result._id,
+        action:status==="Resolved"?"Ticket_Resolved":status==="Closed"?"Ticket_Closed":"Waiting",
+        details:`Status changed from ${oldStatus} to ${status}`
+      })
+    }
+
+    if(priority!==undefined && oldPriority !==priority){
+      await Activity.create({
+        ticket:ticketId,
+        perfomedBy:req.result._id,
+        action:'Priority_Changed',
+        details:`Priority changed from ${oldPriority} to ${priority}`,
+      })
+    }
+
     return res.status(200).json({
       message: "Ticket updated successfully",
       ticket,
@@ -121,15 +152,16 @@ const updateTicket = async (req, res) => {
   }
 };
 
-
 const assignTicket = async (req, res) => {
   try {
-    const { ticketId } = req.params;
-    const { assignedAgent } = req.body;
+    const {ticketId} = req.params;
+    const {assignedAgent} = req.body;
 
-    if (!assignedAgent) {
+    const Agent=await User.findById(assignedAgent);
+
+    if(!Agent){
       return res.status(400).json({
-        message: "Agent ID is required",
+        message: "Agent not found",
       });
     }
 
@@ -141,14 +173,20 @@ const assignTicket = async (req, res) => {
       });
     }
 
-    ticket.assignedAgent = assignedAgent;
+    ticket.assignedAgent = Agent._id;
     ticket.status = "In Progress";
 
     await ticket.save();
 
+    await Activity.create({
+        ticket:ticket._id,
+        performedBy:req.result._id,
+        action:"Ticket_Assigned",
+        details:`Ticket is assigned to ${Agent.name}`
+    }) 
+
     return res.status(200).json({
-      message: "Ticket assigned successfully",
-      ticket,
+      message: "Ticket assigned successfully"
     });
   } catch (err) {
     return res.status(500).json({
@@ -157,5 +195,33 @@ const assignTicket = async (req, res) => {
   }
 };
 
+const getActivity= async (req,res)=>{
+  
+  try{
+  const {ticketId}=req.params;
+  const existTicket=await Ticket.findById(ticketId);
+  if(!existTicket){
+   return res.status(404).json({
+    message:"Ticket not Found"
+   })
+  }
 
-module.exports = {createTicket,getTickets,getTicket,updateTicket,assignTicket};
+   const activities=await Activity.find({
+    ticket:ticketId
+   }).populate("performedBy","name email").sort({createdAt:-1})
+
+ 
+  return res.status(200).json({
+    message:"Activites fetched successfully",
+    activities
+  })
+
+}
+catch(err){
+  return res.status(500).json({
+    message:err.message
+  })
+}
+}
+
+module.exports = {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity};

@@ -18,13 +18,13 @@ const activitySchema = new Schema(
     action: {
       type: String,
       enum: [
-        "TICKET_CREATED",
-        "TICKET_ASSIGNED",
-        "STATUS_CHANGED",
-        "PRIORITY_CHANGED",
-        "COMMENT_ADDED",
-        "TICKET_RESOLVED",
-        "TICKET_CLOSED",
+        "Ticket_Created",
+        "Ticket_Assigned",
+        "Status_Changed",
+        "Priority_Changed",
+        "Comment_Added",
+        "Ticket_Resolved",
+        "Ticket_Closed",
       ],
       required: true,
     },
@@ -39,4 +39,5 @@ const activitySchema = new Schema(
   }
 );
 
-const Activity = mongoose.model("activity", activitySchema);
+const Activity =mongoose.model("activity", activitySchema);
+module.exports=Activity;
