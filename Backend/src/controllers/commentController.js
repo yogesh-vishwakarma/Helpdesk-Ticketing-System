@@ -28,6 +28,12 @@ const addComment=async (req,res)=>{
         })
        }
 
+      if(req.result.role.roleName==="Customer" && ticketexist.customer._id.toString() !== req.result._id){
+        return res.ststus(403).json({
+         message:"You are not allowed to comment on this ticket"
+        })
+      }
+
       const commentType=type||"comment"
         
         
@@ -76,6 +82,12 @@ const getComments=async(req,res)=>{
         message:"Ticket not Found"
       })
     }
+
+     if(req.result.role.roleName==="Customer" && existTicket.customer._id.toString()!==req.result._id.toString()){
+          return res.status(404).json({
+              message:"Customer can only see their own comments."
+          })
+       }
 
     const comments=await Comment.find({
         ticket:ticketId

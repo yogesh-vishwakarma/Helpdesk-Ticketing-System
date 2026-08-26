@@ -1,20 +1,21 @@
 const express = require("express");
 const ticketRouter = express.Router();
 const userMiddleware = require("../middleware/usermiddleware");
+const checkPermission=require("../middleware/permissionmiddleware")
 
-const {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity} = require("../controllers/ticketController");
+const {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity,updateTicketPriority,updateTicketStatus} = require("../controllers/ticketController");
 
-
-// All ticket APIs require authentication
 ticketRouter.use(userMiddleware);
 
 
-ticketRouter.post("/", createTicket);
-ticketRouter.get("/", getTickets);
-ticketRouter.get("/:ticketId", getTicket);
-ticketRouter.patch("/:ticketId", updateTicket);
-ticketRouter.post("/:ticketId/assign", assignTicket);
-ticketRouter.post("/:ticketId/activities",getActivity);
+ticketRouter.post("/",checkPermission("TICKET_CREATE"),createTicket);
+ticketRouter.get("/",checkPermission("TICKET_VIEW_ALL"),getTickets);
+ticketRouter.get("/:ticketId",checkPermission("TICKET_VIEW_OWN"),getTicket);
+ticketRouter.patch("/:ticketId",checkPermission("TICKET_UPDATE"),updateTicket);
+ticketRouter.patch("/:ticketId/status",checkPermission("TICKET_UPDATE_STATUS"),updateTicketStatus);
+ticketRouter.patch("/:ticketId/priority",checkPermission("TICKET_UPDATE_PRIORITY"),updateTicketPriority);
+ticketRouter.post("/:ticketId/assign",checkPermission("TICKET_ASSIGN"),assignTicket);
+ticketRouter.get("/:ticketId/activities",checkPermission("ACTIVITY_VIEW"),getActivity);
 
 
 module.exports = ticketRouter;

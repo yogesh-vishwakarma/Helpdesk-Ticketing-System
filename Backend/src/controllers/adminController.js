@@ -21,9 +21,7 @@ const createPermission=async (req,res)=>{
         )
        }
        
-       const alreadyexist=await Permission.findOne(
-        {name:name.trim()}
-      );
+       const alreadyexist=await Permission.findOne({name:name.trim()});
        if(alreadyexist)
         {
           return res.status(409).json({

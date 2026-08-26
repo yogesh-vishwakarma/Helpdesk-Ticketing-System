@@ -42,10 +42,16 @@ const createTicket = async (req, res) => {
   }
 };
 
-
 const getTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find()
+    let query={}; 
+
+    if(req.result.role.roleName==="Customer"){
+      query.customer=req.result._id;
+    }
+
+
+    const tickets = await Ticket.find(query)
       .populate("customer", "name email")
       .populate("assignedAgent", "name email")
       .sort({ createdAt: -1 });
@@ -60,9 +66,8 @@ const getTickets = async (req, res) => {
   }
 };
 
-
-const getTicket = async (req, res) => {
-  try {
+const getTicket =async (req,res)=>{
+  try{
     const { ticketId } = req.params;
 
     const ticket = await Ticket.findById(ticketId)
@@ -73,6 +78,12 @@ const getTicket = async (req, res) => {
       return res.status(404).json({
         message: "Ticket not found",
       });
+    }
+
+    if(req.result.role.roleName==="Customer" && ticket.customer._id.toString() !== req.result._id.toString()){
+      return res.status(404).json({
+        message:"You are not allowed to view this ticket"
+      })
     }
 
     return res.status(200).json({
@@ -86,7 +97,7 @@ const getTicket = async (req, res) => {
 };
 
 
-const updateTicket = async (req, res) => {
+const updateTicket=async (req,res) =>{
   try {
     const { ticketId } = req.params;
     const { title, description, priority, status, category } = req.body;
@@ -96,6 +107,12 @@ const updateTicket = async (req, res) => {
       return res.status(404).json({
         message: "Ticket not found",
       });
+    }
+
+   if(req.result.role.roleName==="Customer"){
+      return res.status(403).json({
+        message:"Customers can not update tickets"
+      })
     }
 
     const oldStatus=ticket.status;
@@ -126,8 +143,8 @@ const updateTicket = async (req, res) => {
     if(status!==undefined && oldStatus!==status){
       await Activity.create({
         ticket:ticket._id,
-        perfomedBy:req.result._id,
-        action:status==="Resolved"?"Ticket_Resolved":status==="Closed"?"Ticket_Closed":"Waiting",
+        performedBy:req.result._id,
+        action:status === "Resolved"?"Ticket_Resolved": status === "Closed"? "Ticket_Closed":"Status_Changed",
         details:`Status changed from ${oldStatus} to ${status}`
       })
     }
@@ -152,12 +169,115 @@ const updateTicket = async (req, res) => {
   }
 };
 
+const updateTicketStatus=async (req,res)=>{
+  try {
+    const { ticketId } = req.params;
+    const { status } = req.body;
+
+    const ticket = await Ticket.findById(ticketId);
+
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    const oldStatus = ticket.status;
+
+    if (!status) {
+      return res.status(400).json({
+        message: "Status is required",
+      });
+    }
+
+    if (oldStatus === status) {
+      return res.status(400).json({
+        message: "Ticket already has this status",
+      });
+    }
+
+    ticket.status = status;
+
+    await ticket.save();
+
+    await Activity.create({
+      ticket: ticket._id,
+      performedBy: req.result._id,
+      action:status === "Resolved"? "Ticket_Resolved" : status === "Closed" ? "Ticket_Closed" : "Status_Changed", details: `Status changed from ${oldStatus} to ${status}`,
+    });
+
+    return res.status(200).json({
+      message: "Ticket status updated successfully",
+      ticket,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+const updateTicketPriority=async (req, res) =>{
+  try {
+    const { ticketId } = req.params;
+    const { priority } = req.body;
+
+    const ticket = await Ticket.findById(ticketId);
+
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    const oldPriority = ticket.priority;
+
+    if (!priority) {
+      return res.status(400).json({
+        message: "Priority is required",
+      });
+    }
+
+    if (oldPriority === priority) {
+      return res.status(400).json({
+        message: "Ticket already has this priority",
+      });
+    }
+
+    ticket.priority = priority;
+
+    await ticket.save();
+
+    await Activity.create({
+      ticket: ticket._id,
+      performedBy: req.result._id,
+      action: "Priority_Changed",
+      details: `Priority changed from ${oldPriority} to ${priority}`,
+    });
+
+    return res.status(200).json({
+      message: "Ticket priority updated successfully",
+      ticket,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
 const assignTicket = async (req, res) => {
   try {
     const {ticketId} = req.params;
     const {assignedAgent} = req.body;
 
-    const Agent=await User.findById(assignedAgent);
+    const Agent=await User.findById(assignedAgent).populate('role');
+    
+    if(Agent.role.roleName==="Customer"){
+      return res.status(404).json({
+        message:"Customers are not allowed to assign tickets."
+      })
+    }
 
     if(!Agent){
       return res.status(400).json({
@@ -206,6 +326,13 @@ const getActivity= async (req,res)=>{
    })
   }
 
+  if(req.result.role.roleName==="Customer" && ticket.customer._id.toString()!==req.result._id.toString())
+  {
+   return res.status(403).json({
+    message:"You are not allowed to view activities of this ticket"
+   })
+  }
+
    const activities=await Activity.find({
     ticket:ticketId
    }).populate("performedBy","name email").sort({createdAt:-1})
@@ -224,4 +351,4 @@ catch(err){
 }
 }
 
-module.exports = {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity};
+module.exports = {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity,updateTicketPriority,updateTicketStatus};
