@@ -42,14 +42,49 @@ const createTicket = async (req, res) => {
   }
 };
 
-const getTickets = async (req, res) => {
+const getAllTickets = async (req, res) => {
   try {
+
+   const permissions=req.result.role.permissions.map((p)=>p.name);
+
+   const view=req.query.view;
+
     let query={}; 
 
-    if(req.result.role.roleName==="Customer"){
-      query.customer=req.result._id;
-    }
+    switch(view){
+      case "all":
+        if(!permissions.includes("TICKET_VIEW_ALL")){
+           return res.status(403).json({
+            message:"You have no permissions to view all tickets"
+           })
+        }
+        query={}
+        break;
 
+      case "assigned":
+        if(!permissions.includes("TICKET_VIEW_ASSIGNED")){
+          return res.status(403).json({
+            message:"You have no permission to view assigned tickets"
+          })
+        }
+        query.assignedAgent=req.result._id;
+        break;
+
+        case "own":
+          if(!permissions.includes("TICKET_VIEW_OWN")){
+            return res.status(400).json({
+              message:"You have no permission to view own tickets"
+            })
+          }
+
+          query.customer=req.result._id;
+          break;
+
+          default:
+            return res.status(400).json({
+              message:"Invalid view. use all, assigned or own"
+            })
+    }
 
     const tickets = await Ticket.find(query)
       .populate("customer", "name email")
@@ -80,12 +115,18 @@ const getTicket =async (req,res)=>{
       });
     }
 
-    if(req.result.role.roleName==="Customer" && ticket.customer._id.toString() !== req.result._id.toString()){
-      return res.status(404).json({
-        message:"You are not allowed to view this ticket"
-      })
-    }
+    const permissions=req.result.role.permissions.map((p)=>p.name);
 
+    const isowner=ticket.customer?._id.toString()===req.result._id.toString();
+    const isassigned=ticket.assignedAgent?._id.toString()===req.result._id.toString();
+    
+    const allowed=permissions.includes("TICKET_VIEW_ALL")||(permissions.includes("TICKET_VIEW_ASSIGNED") && isassigned) || (permissions.includes("TICKET_VIEW_OWN") && isowner);
+     if (!allowed) {
+      return res.status(403).json({
+        message: "You are not allowed to view this ticket",
+      });
+    }
+    
     return res.status(200).json({
       ticket,
     });
@@ -96,8 +137,7 @@ const getTicket =async (req,res)=>{
   }
 };
 
-
-const updateTicket=async (req,res) =>{
+const updateTicket=async (req,res)=>{
   try {
     const { ticketId } = req.params;
     const { title, description, priority, status, category } = req.body;
@@ -108,13 +148,7 @@ const updateTicket=async (req,res) =>{
         message: "Ticket not found",
       });
     }
-
-   if(req.result.role.roleName==="Customer"){
-      return res.status(403).json({
-        message:"Customers can not update tickets"
-      })
-    }
-
+    
     const oldStatus=ticket.status;
     const oldPriority=ticket.priority;
 
@@ -217,7 +251,7 @@ const updateTicketStatus=async (req,res)=>{
   }
 };
 
-const updateTicketPriority=async (req, res) =>{
+const updateTicketPriority=async (req,res)=>{
   try {
     const { ticketId } = req.params;
     const { priority } = req.body;
@@ -266,23 +300,37 @@ const updateTicketPriority=async (req, res) =>{
   }
 };
 
-const assignTicket = async (req, res) => {
+const assignTicket=async(req,res) => {
   try {
     const {ticketId} = req.params;
     const {assignedAgent} = req.body;
 
-    const Agent=await User.findById(assignedAgent).populate('role');
-    
-    if(Agent.role.roleName==="Customer"){
-      return res.status(404).json({
-        message:"Customers are not allowed to assign tickets."
+    if(!assignedAgent){
+      return res.status(403).json({
+       message:"Assigned agent is required"
       })
     }
 
-    if(!Agent){
+    const Agent=await User.findById(assignedAgent).populate({
+      path:'role',
+      populate:{
+        path:'permissions'
+      }
+    })
+
+    if(!Agent || !Agent.role){
       return res.status(400).json({
         message: "Agent not found",
       });
+    }
+
+    const agentPermissions=Agent.role.permissions.map((p)=>p.name);
+
+    if(!agentPermissions.includes("TICKET_VIEW_ASSIGNED"))
+    {
+      return res.status(403).json({
+          message:"this user is not allowed to receive ticktes"
+        })
     }
 
     const ticket = await Ticket.findById(ticketId);
@@ -326,11 +374,17 @@ const getActivity= async (req,res)=>{
    })
   }
 
-  if(req.result.role.roleName==="Customer" && ticket.customer._id.toString()!==req.result._id.toString())
-  {
-   return res.status(403).json({
-    message:"You are not allowed to view activities of this ticket"
-   })
+  const permissions=req.result.role.permissions.map((p)=p.name);
+
+  const isOwner=existTicket.customer._id.toString()===req.result._id.toString();
+  const isAssigned=existTicket.assignedAgent._id.toString()===req.result._id.toString();
+
+  const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes(("TICKET_VIEW_ASSIGNED")) && isAssigned || (permissions.includes("TICKET_VIEW_OWN")) && isOwner)
+
+  if(!allowed){
+    return res.status(403).json({
+        message: "You are not allowed to view activities of this ticket",
+      });
   }
 
    const activities=await Activity.find({
@@ -351,4 +405,4 @@ catch(err){
 }
 }
 
-module.exports = {createTicket,getTickets,getTicket,updateTicket,assignTicket,getActivity,updateTicketPriority,updateTicketStatus};
+module.exports = {createTicket,getAllTickets,getTicket,updateTicket,assignTicket,getActivity,updateTicketPriority,updateTicketStatus};

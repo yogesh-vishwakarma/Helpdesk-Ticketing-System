@@ -17,7 +17,7 @@ const roleSchema = new Schema(
       {
         type:Schema.Types.ObjectId,
         ref:'permission'
-     }
+     },
     ],
   },
   {
@@ -27,4 +27,3 @@ const roleSchema = new Schema(
 
 const Role = mongoose.model('role', roleSchema);
 module.exports = Role;
-

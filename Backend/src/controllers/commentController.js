@@ -7,47 +7,38 @@ const addComment=async (req,res)=>{
        const {ticketId}=req.params;
        const {message,type,attachment}= req.body;
 
-       if(!message){
+       if(!message?.trim()){
         return res.status(400).json({
           message:"Comment message is required"
         })
        }
 
-       const allowTypes=["comment","internal_note"];
-
-       if(!type && !allowTypes.includes(type)){
-        return res.status(400).json({
-          message:"Invalid Comment type"
-        })
-       }
-     
        const ticketexist=await Ticket.findById(ticketId);
+
        if(!ticketexist){
         return res.status(404).json({
             message:"Ticket not Found"
         })
        }
 
-      if(req.result.role.roleName==="Customer" && ticketexist.customer._id.toString() !== req.result._id){
-        return res.ststus(403).json({
-         message:"You are not allowed to comment on this ticket"
-        })
-      }
+       const permissions=req.result.role.permissions.map((p) => p.name);
+       
+       const isOwner=ticketexist.customer.toString()===req.result._id.toString();
+       const isAssigned =ticketexist.assignedAgent&&ticketexist.assignedAgent.toString() === req.result._id.toString();
 
-      const commentType=type||"comment"
-        
-        
-       if(commentType==="internal_note" && req.result.role.roleName==="Customer"){
-          return res.status(404).json({
-              message:"Customer can not add internal note."
-          })
-       }
+    const allowed=permissions.includes("TICKET_VIEW_ALL") ||(permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned)|| (permissions.includes("TICKET_VIEW_OWN") && isOwner);
+  
+     if (!allowed) {
+       return res.status(403).json({
+          message: "You are not allowed to comment on this ticket",
+       });
+      }
 
       const comment=await Comment.create({
         ticket:ticketId,
         author:req.result._id,
         message,
-        type,
+        type:"comment",
         attachment
        })
 
@@ -55,8 +46,8 @@ const addComment=async (req,res)=>{
         ticket:ticketId,
         performedBy:req.result._id,
         action:"Comment_Added",
-        details:commentType === "internal_note"? "Internal note added to ticket": "Comment added to ticket",
-       })
+        details:"Comment added to ticket", 
+      })
 
        res.status(201).json({
         message:"Comment added Successfully",
@@ -83,29 +74,121 @@ const getComments=async(req,res)=>{
       })
     }
 
-     if(req.result.role.roleName==="Customer" && existTicket.customer._id.toString()!==req.result._id.toString()){
-          return res.status(404).json({
-              message:"Customer can only see their own comments."
-          })
-       }
+    const permissions=req.result.role.permissions.map((p)=>p.name);
 
-    const comments=await Comment.find({
-        ticket:ticketId
-    })
+    const isOwner=existTicket.customer._id.toString()===req.result._id.toString();
+    const isAssigned=existTicket.assignedAgent && existTicket.assignedAgent._id.toString()===req.result._id.toString();
+
+    const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned) || (permissions.includes("TICKET_VIEW_OWN") && isOwner);
+   
+    if(!allowed) {
+      return res.status(403).json({
+        message: "You are not allowed to view comments of this ticket",
+      });
+    }
+
+    let query={ticket:ticketId,type:"comment"};
+
+    const comments=await Comment.find(query)
+    .populate("author", "name email")
+    .sort({ createdAt: -1 });
 
     res.status(200).json({
         comments
     })
    }
    catch(err){
-     res.send(404).json({
+     res.status(404).json({
         message:err.message
      })
    }
 }
 
-//const addInternalNote=async(req,res)=>{
+const addInternalNote=async (req,res)=>{
+  try {
+    const {ticketId} = req.params;
+    const {message, attachment} = req.body;
 
-// } 
+    if (!message?.trim()) {
+      return res.status(400).json({
+        message: "Internal note message is required",
+      });
+    }
 
-module.exports={addComment,getComments}
+    const ticket=await Ticket.findById(ticketId);
+
+    if(!ticket){
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    const permissions = req.result.role.permissions.map((p) => p.name);
+
+    const isAssigned=ticket.assignedAgent?.toString() === req.result._id.toString();
+
+    const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned);
+
+    if (!allowed) {
+      return res.status(403).json({
+        message: "You are not allowed to add an internal note to this ticket",
+      });
+    }
+
+    const note = await Comment.create({
+      ticket: ticketId,
+      author: req.result._id,
+      message: message.trim(),
+      type: "internal_note",
+      attachment,
+    });
+
+    await Activity.create({
+      ticket: ticketId,
+      performedBy: req.result._id,
+      action: "Internal_Note_Added",
+      details: "Internal note added to ticket",
+    });
+
+    return res.status(201).json({
+      message: "Internal note added successfully",
+      note,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}; 
+
+const getInternalNotes =async(req,res)=>{
+  try {
+    const {ticketId}=req.params;
+
+    const ticket=await Ticket.findById(ticketId);
+
+    if (!ticket){
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    const notes=await Comment.find({
+      ticket: ticketId,
+      type:"internal_note",
+    })
+    .populate("author", "name email")
+    .sort({createdAt: -1});
+
+    return res.status(200).json({
+      message: "Internal notes fetched successfully",
+      notes,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+module.exports={addComment,getComments,addInternalNote,getInternalNotes}

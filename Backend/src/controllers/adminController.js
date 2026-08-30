@@ -174,8 +174,6 @@ const createRole = async (req, res) => {
   }
 };
 
-
-// Get All Roles
 const getRoles = async (req, res) => {
   try {
     const roles = await Role.find().populate('permisssions').sort({ createdAt: -1 });
@@ -190,8 +188,6 @@ const getRoles = async (req, res) => {
   }
 };
 
-
-// Update Role
 const updateRole = async (req, res) => {
   try {
     const { roleId } = req.params;
@@ -241,8 +237,6 @@ const updateRole = async (req, res) => {
   }
 };
 
-
-// Delete Role
 const deleteRole = async (req, res) => {
   try {
     const { roleId } = req.params;
@@ -283,7 +277,6 @@ const deleteRole = async (req, res) => {
 // USER MANAGEMENT
 // =====================================================
 
-// Admin Creates User
 const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -337,8 +330,6 @@ const createUser = async (req, res) => {
   }
 };
 
-
-// Get All Users
 const getUsers = async (req, res) => {
   try {
    const users = await User.find()
@@ -360,8 +351,6 @@ const getUsers = async (req, res) => {
   }
 };
 
-
-// Change User Role
 const updateUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -409,8 +398,6 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-
-// Delete User
 const deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -441,6 +428,5 @@ const deleteUser = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {createRole,getRoles,updateRole,deleteRole,createUser,getUsers,updateUserRole,deleteUser,createPermission,getPermissions,updatePermission,deletePermission};

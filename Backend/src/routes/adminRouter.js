@@ -1,7 +1,7 @@
 const express = require("express");
 const adminRouter = express.Router();
 const adminMiddleware = require("../middleware/adminmiddleware");
-const checkPermission=require("../middleware/permissionmiddleware");
+const {checkPermission,checkAnyPermission}=require("../middleware/permissionmiddleware");
 
 const { createRole,getRoles,updateRole,deleteRole,createUser,getUsers,updateUserRole,deleteUser,createPermission,getPermissions,updatePermission,deletePermission} = require("../controllers/adminController");
 
