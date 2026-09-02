@@ -176,7 +176,7 @@ const createRole = async (req, res) => {
 
 const getRoles = async (req, res) => {
   try {
-    const roles = await Role.find().populate('permisssions').sort({ createdAt: -1 });
+    const roles = await Role.find().populate('permissions').sort({ createdAt: -1 });
 
     return res.status(200).json({
       roles,
@@ -221,8 +221,19 @@ const updateRole = async (req, res) => {
     }
 
     if (permissions !== undefined) {
-      role.permissions = permissions;
-    }
+      if (permissions !== undefined){
+          const existingPermissions = await Permission.find({_id:{ $in: permissions }
+      });
+
+      if(existingPermissions.length!==permissions.length){
+        return res.status(404).json({
+            message: "One or more permission IDs do not exist"
+        });
+       }
+      }
+       role.permissions = permissions;
+      }
+      
 
     await role.save();
 

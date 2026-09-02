@@ -105,11 +105,11 @@ const getComments=async(req,res)=>{
 }
 
 const addInternalNote=async (req,res)=>{
-  try {
+  try{
     const {ticketId} = req.params;
     const {message, attachment} = req.body;
 
-    if (!message?.trim()) {
+    if(!message?.trim()){
       return res.status(400).json({
         message: "Internal note message is required",
       });
@@ -123,38 +123,38 @@ const addInternalNote=async (req,res)=>{
       });
     }
 
-    const permissions = req.result.role.permissions.map((p) => p.name);
+    const permissions=req.result.role.permissions.map((p) => p.name);
 
     const isAssigned=ticket.assignedAgent?.toString() === req.result._id.toString();
 
     const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned);
 
-    if (!allowed) {
+    if (!allowed){
       return res.status(403).json({
         message: "You are not allowed to add an internal note to this ticket",
       });
     }
 
-    const note = await Comment.create({
-      ticket: ticketId,
-      author: req.result._id,
-      message: message.trim(),
-      type: "internal_note",
+    const note=await Comment.create({
+      ticket:ticketId,
+      author:req.result._id,
+      message:message.trim(),
+      type:"internal_note",
       attachment,
     });
 
     await Activity.create({
-      ticket: ticketId,
-      performedBy: req.result._id,
-      action: "Internal_Note_Added",
-      details: "Internal note added to ticket",
+      ticket:ticketId,
+      performedBy:req.result._id,
+      action:"Internal_Note_Added",
+      details:"Internal note added to ticket",
     });
 
     return res.status(201).json({
-      message: "Internal note added successfully",
+      message:"Internal note added successfully",
       note,
     });
-  } catch (err) {
+  } catch(err){
     return res.status(500).json({
       message: err.message,
     });

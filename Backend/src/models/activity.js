@@ -23,6 +23,7 @@ const activitySchema = new Schema(
         "Status_Changed",
         "Priority_Changed",
         "Comment_Added",
+        "Internal_Note_Added",
         "Ticket_Resolved",
         "Ticket_Closed",
       ],

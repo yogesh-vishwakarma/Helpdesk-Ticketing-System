@@ -4,9 +4,10 @@ const cookieParser = require("cookie-parser");
 
 const main = require("./config/db");
 const authRouter = require("./routes/userAuth");
-const adminRouter = require("./routes/adminRouter");
+const managementRouter = require("./routes/managementRouter");
 const ticketRouter = require("./routes/ticketRouter");
 const commentRouter=require("./routes/commentRouter")
+const dashboardRouter=require("./routes/dashboardRouter");
 
 const app = express();
 app.use(cookieParser());
@@ -14,10 +15,10 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/auth", authRouter);
-app.use("/admin", adminRouter);
+app.use("/management", managementRouter);
 app.use("/tickets", ticketRouter);
 app.use("/comments",commentRouter)
-//app.use("/dashboard",dashboardRouter);
+app.use("/dashboard",dashboardRouter);
 
 
 const initializeConnection = async () => {

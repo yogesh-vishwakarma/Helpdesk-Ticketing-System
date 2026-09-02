@@ -13,10 +13,13 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role=await Role.findOne({
-      roleName:"Customer"
-    })
+    // const role=await Role.findOne({
+    //   roleName:"Customer"
+    // })
+    
+   //Customer:"6a91932de9837a0b3bffcacf"
 
+    const role = await Role.findById("6a91932de9837a0b3bffcacf");
 
     const user = await User.create({
       name,
@@ -124,4 +127,35 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = {register,login,logout};
+const deleteUser = async (req, res) => {
+  try{
+    const { serId} = req.params;
+
+    // Prevent logged-in user from deleting himself
+    if(req.result._id.toString() === userId){
+      return res.status(400).json({
+        message:"You cannot delete your own account"
+      })
+    }
+
+    const user=await User.findById(userId);
+
+    if (!user){
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    return res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch(err){
+    return res.status(500).json({
+      message:err.message
+    });
+  }
+};
+
+module.exports = {register,login,logout,deleteUser};

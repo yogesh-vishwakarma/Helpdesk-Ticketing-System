@@ -387,9 +387,17 @@ const getActivity= async (req,res)=>{
       });
   }
 
-   const activities=await Activity.find({
-    ticket:ticketId
-   }).populate("performedBy","name email").sort({createdAt:-1})
+  let query={
+  ticket: ticketId,
+   };
+
+   if(!permissions.includes("INTERNAL_NOTE_VIEW")){
+      query.action={$ne:"Internal_Note_Added"};
+    }
+
+
+   const activities=await Activity.find(query)
+   .populate("performedBy","name email").sort({createdAt:-1})
 
  
   return res.status(200).json({

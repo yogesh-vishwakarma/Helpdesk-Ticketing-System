@@ -19,8 +19,13 @@ const userMiddleware = async (req, res, next) => {
       });
     }
 
-    const user = await User.findById(payload._id).populate("role");
-
+    const user= await User.findById(payload._id).populate({
+      path:'role',
+      populate:{
+        path:'permissions'
+      }
+    });
+    
     if (!user) {
       return res.status(401).json({
         message: "User not found",
