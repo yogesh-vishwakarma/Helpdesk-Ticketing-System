@@ -8,9 +8,15 @@ const managementRouter = require("./routes/managementRouter");
 const ticketRouter = require("./routes/ticketRouter");
 const commentRouter=require("./routes/commentRouter")
 const dashboardRouter=require("./routes/dashboardRouter");
+const cors=require('cors');
 
 const app = express();
 app.use(cookieParser());
+
+app.use(cors({
+  origin:'http://localhost:5173',
+  credentials: true 
+}))
 
 app.use(express.json());
 

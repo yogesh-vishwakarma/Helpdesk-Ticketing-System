@@ -48,7 +48,7 @@ const register = async (req, res) => {
       role:role.name,
     };
 
-    res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
+    res.cookie("token", token, { maxAge: 24*60 * 60 * 1000 });
 
     res.status(201).json({
       user: reply,
@@ -100,7 +100,7 @@ const login = async (req, res) => {
       role: user.role.roleName,
     };
 
-    res.cookie("token", token, {maxAge: 60 * 60 * 1000});
+    res.cookie("token", token, {maxAge: 24 *60 * 60 * 1000});
 
     res.status(200).json({
       user: reply,

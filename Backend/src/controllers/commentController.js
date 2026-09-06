@@ -26,7 +26,7 @@ const addComment=async (req,res)=>{
        const isOwner=ticketexist.customer.toString()===req.result._id.toString();
        const isAssigned =ticketexist.assignedAgent&&ticketexist.assignedAgent.toString() === req.result._id.toString();
 
-    const allowed=permissions.includes("TICKET_VIEW_ALL") ||(permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned)|| (permissions.includes("TICKET_VIEW_OWN") && isOwner);
+    const allowed=permissions.includes("TICKET_VIEW_ALL") ||(permissions.includes("TICKET_RECEIVE_ASSIGNED") && isAssigned)|| (permissions.includes("TICKET_VIEW_OWN") && isOwner);
   
      if (!allowed) {
        return res.status(403).json({
@@ -127,7 +127,7 @@ const addInternalNote=async (req,res)=>{
 
     const isAssigned=ticket.assignedAgent?.toString() === req.result._id.toString();
 
-    const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned);
+    const allowed=permissions.includes("TICKET_VIEW_ALL") || (permissions.includes("TICKET_VIEW_ASSIGNED") && isAssigned) ;
 
     if (!allowed){
       return res.status(403).json({

@@ -310,7 +310,7 @@ const assignTicket=async(req,res) => {
        message:"Assigned agent is required"
       })
     }
-
+ 
     const Agent=await User.findById(assignedAgent).populate({
       path:'role',
       populate:{
@@ -326,7 +326,7 @@ const assignTicket=async(req,res) => {
 
     const agentPermissions=Agent.role.permissions.map((p)=>p.name);
 
-    if(!agentPermissions.includes("TICKET_VIEW_ASSIGNED"))
+    if(!agentPermissions.includes("TICKET_RECEIVE_ASSIGNED"))
     {
       return res.status(403).json({
           message:"this user is not allowed to receive ticktes"
@@ -334,6 +334,11 @@ const assignTicket=async(req,res) => {
     }
 
     const ticket = await Ticket.findById(ticketId);
+
+    if(ticket.assignedAgent!=null)
+      return res.status(403).json({
+       message:"This Ticket is already assigned to any agent"
+      })
 
     if (!ticket) {
       return res.status(404).json({
