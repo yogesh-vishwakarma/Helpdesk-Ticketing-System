@@ -35,7 +35,7 @@ const register = async (req, res) => {
         message: "Customer role not found",
       });
     }
-    
+
     const user = await User.create({
       name,
       email,
@@ -65,10 +65,17 @@ const register = async (req, res) => {
 
     res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
 
-    res.status(201).json({
-      user: reply,
-      message: "Registered Successfully",
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
+
+    // res.status(201).json({
+    //   user: reply,
+    //   message: "Registered Successfully",
+    // });
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -123,10 +130,17 @@ const login = async (req, res) => {
 
     res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
 
-    res.status(200).json({
-      user: reply,
-      message: "Logged in Successfully",
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
+
+    // res.status(200).json({
+    //   user: reply,
+    //   message: "Logged in Successfully",
+    // });
   } catch (err) {
     res.status(401).json({
       message: err.message,
@@ -136,7 +150,12 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token");
+    // res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
 
     res.status(200).json({
       success: true,
@@ -197,7 +216,8 @@ const getCurrentUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role?.roleName,
-      permissions:user.role?.permissions?.map((permission) => permission.name) || [],
+      permissions:
+        user.role?.permissions?.map((permission) => permission.name) || [],
     };
 
     return res.status(200).json({
@@ -211,5 +231,4 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-
-module.exports = { register, login, logout, deleteUser ,getCurrentUser};
+module.exports = { register, login, logout, deleteUser, getCurrentUser };
