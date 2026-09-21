@@ -17,7 +17,8 @@ app.use(cors({
   origin:[
     'http://localhost:5173',
     "https://helpdesk-ticketing-frontend.vercel.app",
-    "https://helpdesk-ticketing-frontend-git-main-yogesh-vishwakarma.vercel.app"
+    "https://helpdesk-ticketing-frontend-git-main-yogesh-vishwakarma.vercel.app",
+    "https://helpdesk-ticketing-frontend-gjig2anj4-yogesh-vishwakarma.vercel.app"
   ],
   credentials: true 
 }))
