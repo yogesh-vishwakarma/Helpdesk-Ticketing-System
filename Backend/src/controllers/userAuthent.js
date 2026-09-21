@@ -128,8 +128,6 @@ const login = async (req, res) => {
       permissions: user.role.permissions.map((p) => p.name),
     };
 
-    res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -137,10 +135,10 @@ const login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    // res.status(200).json({
-    //   user: reply,
-    //   message: "Logged in Successfully",
-    // });
+    res.status(200).json({
+      user: reply,
+      message: "Logged in Successfully",
+    });
   } catch (err) {
     res.status(401).json({
       message: err.message,
