@@ -33,20 +33,20 @@ import {
 import axios from "../../services/axios";
 import usePermission from "../../hooks/usePermission";
 
-import LoadingState from "../../components/TicketDetails/LoadingState";
-import ErrorState from "../../components/TicketDetails/ErrorState";
-import ErrorAlert from "../../components/TicketDetails/ErrorAlert";
-import TicketHero from "../../components/TicketDetails/TicketHero";
-import TicketDescription from "../../components/TicketDetails/TicketDescription";
-import TicketTabs from "../../components/TicketDetails/TicketTabs";
-import CommentsTab from "../../components/TicketDetails/CommentsTab";
-import InternalNotesTab from "../../components/TicketDetails/InternalNotesTab";
-import ActivityTab from "../../components/TicketDetails/ActivityTab";
-import AssignmentCard from "../../components/TicketDetails/AssignmentCard";
-import StatusPriorityCard from "../../components/TicketDetails/StatusPriorityCard";
-import AttachmentsCard from "../../components/TicketDetails/AttachmentsCard";
-import EditTicketButton from "../../components/TicketDetails/EditTicketButton";
-import Toast from "../../components/TicketDetails/Toast";
+import LoadingState from "../../Components/TicketDetails/LoadingState";
+import ErrorState from "../..Ccomponents/TicketDetails/ErrorState";
+import ErrorAlert from "../../Components/TicketDetails/ErrorAlert";
+import TicketHero from "../../Components/TicketDetails/TicketHero";
+import TicketDescription from "../../Components/TicketDetails/TicketDescription";
+import TicketTabs from "../../Components/TicketDetails/TicketTabs";
+import CommentsTab from "../../Components/TicketDetails/CommentsTab";
+import InternalNotesTab from "../../Components/TicketDetails/InternalNotesTab";
+import ActivityTab from "../../Components/TicketDetails/ActivityTab";
+import AssignmentCard from "../../Components/TicketDetails/AssignmentCard";
+import StatusPriorityCard from "../../Components/TicketDetails/StatusPriorityCard";
+import AttachmentsCard from "../../Components/TicketDetails/AttachmentsCard";
+import EditTicketButton from "../../Components/TicketDetails/EditTicketButton";
+import Toast from "../../Components/TicketDetails/Toast";
 
 
 const TicketDetails = () => {
