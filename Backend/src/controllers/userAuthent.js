@@ -232,3 +232,9 @@ const getCurrentUser = async (req, res) => {
 };
 
 module.exports = { register, login, logout, deleteUser, getCurrentUser };
+
+
+
+
+
+// module.exports = { register, login, logout, deleteUser, getCurrentUser };

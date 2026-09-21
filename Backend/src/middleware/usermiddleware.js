@@ -31,7 +31,7 @@ const userMiddleware = async (req, res, next) => {
         message: "User not found",
       });
     }
-
+    
     req.result = user;
 
     next();
