@@ -16,7 +16,8 @@ app.use(cookieParser());
 app.use(cors({
   origin:[
     'http://localhost:5173',
-    "https://helpdesk-ticketing-frontend.vercel.app"
+    "https://helpdesk-ticketing-frontend.vercel.app",
+    "https://helpdesk-ticketing-frontend-git-main-yogesh-vishwakarma.vercel.app"
   ],
   credentials: true 
 }))
