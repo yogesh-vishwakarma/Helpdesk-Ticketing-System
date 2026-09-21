@@ -1,124 +1,140 @@
 const bcrypt = require("bcrypt");
 const Role = require("../models/role");
 const User = require("../models/user");
-const Permission=require("../models/permission");
-
+const Permission = require("../models/permission");
 
 //=====================================================
 //PERMISSION MANAGEMENT
 //=====================================================
-const createPermission=async (req,res)=>{
-     
-     try{
-         
-      const {name,description}=req.body;
+const createPermission = async (req, res) => {
+  try {
+    const { name, description } = req.body;
 
-       if(!name || !description){
-        return res.status(404).json(
-          {
-            message:"Name and Description is required"
-          }
-        )
-       }
-       
-       const alreadyexist=await Permission.findOne({name:name.trim()});
-       if(alreadyexist)
-        {
-          return res.status(409).json({
-            message:"Permission already exist"
-          }
-        )} 
-          
-        const permission=await Permission.create({
-           name:name.trim(),
-           description,
-        });
+    if (!name || !description) {
+      return res.status(404).json({
+        message: "Name and Description is required",
+      });
+    }
+
+    const permissionName = name.trim().toUpperCase();
+
+    const alreadyexist = await Permission.findOne({ name: permissionName });
+    if (alreadyexist) {
+      return res.status(409).json({
+        message: "Permission already exist",
+      });
+    }
+
+    const permission = await Permission.create({
+      name: permissionName,
+      description,
+    });
 
     return res.status(201).json({
-      message:"Permission Created Successfully",
-      permission
-     })
-
-     }
-     catch(err){
-          res.status(500).json({
-            message:err.message
-          })
-     }
-
-}
-
-const getPermissions=async (req,res)=>{
-    try{
-     const permission=await Permission.find().sort({createdAt:-1});
-     
-     if(!permission){
-      return res.send("No Permission Exist");
-     }
-
-     res.status(200).json({
-      permission
-     })
-    }
-    catch(err){
-       res.status(500).json({
-        message:err.message
-       })
-    }
-}
-
-const updatePermission=async (req,res)=>{
-
-  try{      
-   const {id}=req.params; 
-   const {name,description}=req.body;
-   const permission=await Permission.findById(id);
-   if(!permission){
-     return res.status(404).json({
-      message:"Permission document not Exist"
-     })
-   }
-   
-   if(name!==undefined)
-     permission.name=name;
-
-   if(description!==undefined)
-     permission.description=description;
-
-
-   await permission.save();
-
-   res.status(200).json({
-     message:"Permission Updated successfully"
-   })
-}
-  catch(err){
-     res.status(500).json({
-      message:err.message
-     })
+      message: "Permission Created Successfully",
+      permission,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
   }
-}
+};
 
-const deletePermission=async (req,res)=>{
-    try{
-         const {id}=req.params;
-   
-        const permission=await Permission.findById(id);
-        if(!permission){
-            return res.status(404).json({
-              message:"Permmission document not exist"
-            })
-        }
+const getPermissions = async (req, res) => {
+  try {
+    const permission = await Permission.find().sort({ createdAt: -1 });
 
-         await Permission.findByIdAndDelete(id);
-         res.send("Permission deleted Successfully")
+    if (!permission) {
+      return res.send("No Permission Exist");
     }
-    catch(err){
-        res.status(500).json({
-          message:err.message
-      })
+
+    res.status(200).json({
+      permission,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+const updatePermission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+    const permission = await Permission.findById(id);
+    if (!permission) {
+      return res.status(404).json({
+        message: "Permission document not Exist",
+      });
     }
-}
+
+    if (name !== undefined) {
+      if (!name.trim()) {
+        return res.status(400).json({
+          message: "Permission name cannot be empty",
+        });
+      }
+
+      const permissionName = name.trim().toUpperCase();
+
+      // Check duplicate name
+      const alreadyExist = await Permission.findOne({
+        name: permissionName,
+        _id: { $ne: id },
+      });
+
+      if (alreadyExist) {
+        return res.status(409).json({
+          message: "Permission name already exists",
+        });
+      }
+
+      permission.name = permissionName;
+    }
+
+    if (description !== undefined) {
+      if (!description.trim()) {
+        return res.status(400).json({
+          message: "Description cannot be empty",
+        });
+      }
+
+      permission.description = description.trim();
+    }
+
+    await permission.save();
+
+    res.status(200).json({
+      message: "Permission Updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+const deletePermission = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const permission = await Permission.findById(id);
+    if (!permission) {
+      return res.status(404).json({
+        message: "Permmission document not exist",
+      });
+    }
+
+    await Permission.findByIdAndDelete(id);
+    res.send("Permission deleted Successfully");
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
 
 // =====================================================
 // ROLE MANAGEMENT
@@ -126,7 +142,7 @@ const deletePermission=async (req,res)=>{
 
 const createRole = async (req, res) => {
   try {
-    const { roleName, description, permissions=[] } = req.body;
+    const { roleName, description, permissions = [] } = req.body;
 
     if (!roleName) {
       return res.status(400).json({
@@ -144,17 +160,14 @@ const createRole = async (req, res) => {
       });
     }
 
-     const existingPermission=await Permission.find(
-      {
-        _id: {$in:permissions}
-      }
-    );
-       
-    if(existingPermission.length!==permissions.length)
-    {
+    const existingPermission = await Permission.find({
+      _id: { $in: permissions },
+    });
+
+    if (existingPermission.length !== permissions.length) {
       return res.status(404).json({
-        message:"One or more permission IDs do not exist"
-      })
+        message: "One or more permission IDs do not exist",
+      });
     }
 
     const role = await Role.create({
@@ -176,7 +189,9 @@ const createRole = async (req, res) => {
 
 const getRoles = async (req, res) => {
   try {
-    const roles = await Role.find().populate('permissions').sort({ createdAt: -1 });
+    const roles = await Role.find()
+      .populate("permissions")
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       roles,
@@ -221,19 +236,19 @@ const updateRole = async (req, res) => {
     }
 
     if (permissions !== undefined) {
-      if (permissions !== undefined){
-          const existingPermissions = await Permission.find({_id:{ $in: permissions }
-      });
-
-      if(existingPermissions.length!==permissions.length){
-        return res.status(404).json({
-            message: "One or more permission IDs do not exist"
+      if (permissions !== undefined) {
+        const existingPermissions = await Permission.find({
+          _id: { $in: permissions },
         });
-       }
+
+        if (existingPermissions.length !== permissions.length) {
+          return res.status(404).json({
+            message: "One or more permission IDs do not exist",
+          });
+        }
       }
-       role.permissions = permissions;
-      }
-      
+      role.permissions = permissions;
+    }
 
     await role.save();
 
@@ -282,7 +297,6 @@ const deleteRole = async (req, res) => {
     });
   }
 };
-
 
 // =====================================================
 // USER MANAGEMENT
@@ -343,14 +357,14 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-   const users = await User.find()
-   .populate({
-      path: "role",
-      populate: {
-      path: "permissions",
-     },
-    })
-    .sort({ createdAt: -1 });
+    const users = await User.find()
+      .populate({
+        path: "role",
+        populate: {
+          path: "permissions",
+        },
+      })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       users,
@@ -440,4 +454,17 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = {createRole,getRoles,updateRole,deleteRole,createUser,getUsers,updateUserRole,deleteUser,createPermission,getPermissions,updatePermission,deletePermission};
+module.exports = {
+  createRole,
+  getRoles,
+  updateRole,
+  deleteRole,
+  createUser,
+  getUsers,
+  updateUserRole,
+  deleteUser,
+  createPermission,
+  getPermissions,
+  updatePermission,
+  deletePermission,
+};

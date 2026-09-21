@@ -26,6 +26,7 @@ const activitySchema = new Schema(
         "Internal_Note_Added",
         "Ticket_Resolved",
         "Ticket_Closed",
+        "TICKET_DELETED"
       ],
       required: true,
     },

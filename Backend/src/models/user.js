@@ -23,7 +23,16 @@ const userSchema = new Schema({
   role: {
   type: Schema.Types.ObjectId,
   ref: "role"
-}
+},
+isDeleted: {
+  type: Boolean,
+  default: false,
+},
+
+deletedAt: {
+  type: Date,
+  default: null,
+},
 }, { timestamps: true });
 
 const User=mongoose.model('user', userSchema);

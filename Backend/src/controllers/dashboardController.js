@@ -283,7 +283,7 @@ const getAgents = async (req, res) => {
   try {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-    if (!permissions.includes("TICKET_VIEW_ALL")) {
+    if (!permissions.includes("AGENT_VIEW")) {
       return res.status(403).json({
         message: "You do not have permission to view agents",
       });

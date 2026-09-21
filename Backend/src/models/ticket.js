@@ -3,6 +3,12 @@ const Schema = mongoose.Schema;
 
 const ticketSchema = new Schema(
   {
+    ticketId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
     title: {
       type: String,
       required: true,
@@ -17,13 +23,13 @@ const ticketSchema = new Schema(
 
     customer: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: "user",
       required: true,
     },
 
     assignedAgent: {
       type: Schema.Types.ObjectId,
-      ref:'user',
+      ref: "user",
       default: null,
     },
 
@@ -33,36 +39,39 @@ const ticketSchema = new Schema(
       default: "Medium",
     },
 
-    status:{
+    status: {
       type: String,
       enum: ["Open", "In Progress", "Waiting", "Resolved", "Closed"],
       default: "Open",
     },
 
-    category:{
+    category: {
       type: String,
       required: true,
       trim: true,
     },
 
-    attachments:[
+    attachments: [
       {
-        url:{
-          type: String,
-          trim: true,
-        },
-
-        fileName:{
-          type: String,
-          trim: true,
-        },
+        type: Schema.Types.ObjectId,
+        ref: "attachment",
       },
     ],
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps:true,
-  }
+    timestamps: true,
+  },
 );
 
-const Ticket = mongoose.model('ticket', ticketSchema);
-module.exports = Ticket;    
+const Ticket = mongoose.model("ticket", ticketSchema);
+module.exports = Ticket;
