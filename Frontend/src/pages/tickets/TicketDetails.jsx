@@ -34,7 +34,7 @@ import axios from "../../services/axios";
 import usePermission from "../../hooks/usePermission";
 
 import LoadingState from "../../Components/TicketDetails/LoadingState";
-import ErrorState from "../..Ccomponents/TicketDetails/ErrorState";
+import ErrorState from "../..Components/TicketDetails/ErrorState";
 import ErrorAlert from "../../Components/TicketDetails/ErrorAlert";
 import TicketHero from "../../Components/TicketDetails/TicketHero";
 import TicketDescription from "../../Components/TicketDetails/TicketDescription";
