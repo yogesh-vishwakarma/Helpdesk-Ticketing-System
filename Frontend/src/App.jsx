@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate ,useLocation } from "react-router";
 
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -26,11 +26,18 @@ import Permissions from "./pages/admin/Permissions";
 
 function App() {
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const isPublicRoute = ["/", "/login", "/signup"].includes(
+    location.pathname
+  );
 
   // Check existing authentication when app starts
-  useEffect(() => {
-    dispatch(getCurrentUser());
-  }, [dispatch]);
+  useEffect(()=>{
+    if (!isPublicRoute){
+      dispatch(getCurrentUser());
+    }
+  },[dispatch,isPublicRoute]);
 
   return (
     <Routes>
