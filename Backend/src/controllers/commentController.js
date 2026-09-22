@@ -2,6 +2,8 @@ const Comment = require("../models/comment");
 const Ticket = require("../models/ticket");
 const Activity = require("../models/activity");
 
+const { getIO } = require("../socket");
+
 const addComment = async (req, res) => {
   try {
     const { ticketId } = req.params;
@@ -57,6 +59,17 @@ const addComment = async (req, res) => {
       details: "Comment added to ticket",
     });
 
+    const populatedComment = await Comment.findById(comment._id).populate(
+      "author",
+      "name email",
+    );
+
+    const io = getIO();
+
+    io.to(`ticket:${ticketId}`).emit("newComment", {
+      comment: populatedComment,
+    });
+
     res.status(201).json({
       message: "Comment added Successfully",
       comment,
@@ -81,7 +94,8 @@ const getComments = async (req, res) => {
 
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-  const isOwner=existTicket.customer.toString() === req.result._id.toString();
+    const isOwner =
+      existTicket.customer.toString() === req.result._id.toString();
 
     // const isOwner =
     //   existTicket.customer._id.toString() === req.result._id.toString();
@@ -163,6 +177,17 @@ const addInternalNote = async (req, res) => {
       performedBy: req.result._id,
       action: "Internal_Note_Added",
       details: "Internal note added to ticket",
+    });
+
+    const populatedNote = await Comment.findById(note._id).populate(
+      "author",
+      "name email",
+    );
+
+    const io = getIO();
+
+    io.to(`ticket:${ticketId}:internal`).emit("newInternalNote", {
+      note: populatedNote,
     });
 
     return res.status(201).json({

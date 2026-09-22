@@ -32,6 +32,7 @@ import {
 
 import axios from "../../services/axios";
 import usePermission from "../../hooks/usePermission";
+import socket from "../../services/socket";
 
 import LoadingState from "../../Components/TicketDetails/LoadingState";
 import ErrorState from "../../Components/TicketDetails/ErrorState";
@@ -47,7 +48,6 @@ import StatusPriorityCard from "../../Components/TicketDetails/StatusPriorityCar
 import AttachmentsCard from "../../Components/TicketDetails/AttachmentsCard";
 import EditTicketButton from "../../Components/TicketDetails/EditTicketButton";
 import Toast from "../../Components/TicketDetails/Toast";
-
 
 const TicketDetails = () => {
   const { ticketId } = useParams();
@@ -193,6 +193,81 @@ const TicketDetails = () => {
     if (ticketId) loadData();
   }, [ticketId]);
 
+  useEffect(() => {
+    if (!ticketId) return;
+
+    // Join normal ticket room
+    socket.emit("joinTicket", ticketId);
+
+    // Join internal-note room only for authorized staff
+    if (canViewInternalNotes) {
+      socket.emit("joinInternalTicket", ticketId);
+    }
+
+    return () => {
+      // Leave normal ticket room
+      socket.emit("leaveTicket", ticketId);
+
+      // Leave internal-note room
+      if (canViewInternalNotes) {
+        socket.emit("leaveInternalTicket", ticketId);
+      }
+    };
+  }, [ticketId, canViewInternalNotes]);
+
+  useEffect(() => {
+    const handleNewComment = ({ comment }) => {
+      setComments((previousComments) => {
+        // Prevent duplicate comment
+        const alreadyExists = previousComments.some(
+          (item) => item._id === comment._id,
+        );
+
+        if (alreadyExists) {
+          return previousComments;
+        }
+
+        return [...previousComments, comment];
+      });
+
+      // Show latest comments
+      setCommentPage(1);
+    };
+
+    socket.on("newComment", handleNewComment);
+
+    return () => {
+      socket.off("newComment", handleNewComment);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleNewInternalNote = ({ note }) => {
+      setInternalNotes((previousNotes) => {
+        // Prevent duplicate note
+        const alreadyExists = previousNotes.some(
+          (item) => item._id === note._id,
+        );
+
+        if (alreadyExists) {
+          return previousNotes;
+        }
+
+        // Newest note should appear first
+        return [note, ...previousNotes];
+      });
+
+      // Show latest internal notes
+      setInternalNotePage(1);
+    };
+
+    socket.on("newInternalNote", handleNewInternalNote);
+
+    return () => {
+      socket.off("newInternalNote", handleNewInternalNote);
+    };
+  }, []);
+
   /* ================= HANDLERS ================= */
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -226,7 +301,7 @@ const TicketDetails = () => {
       setSubmittingInternalNote(true);
       setError("");
       await axios.post(`/comments/${ticketId}/internal`, {
-        content: internalNote.trim(),
+        message: internalNote.trim(),
       });
       const internalNoteResponse = await axios.get(
         `/comments/${ticketId}/internal-notes`,
@@ -291,8 +366,7 @@ const TicketDetails = () => {
       );
     } catch (error) {
       console.error("UPDATE PRIORITY ERROR:", error);
-      const msg =
-        error.response?.data?.message || "Unable to update priority.";
+      const msg = error.response?.data?.message || "Unable to update priority.";
       setError(msg);
       pushToast("error", "Failed to update priority", msg);
     } finally {
@@ -451,8 +525,7 @@ const TicketDetails = () => {
       }
 
       console.error("UPLOAD ERROR:", error);
-      const msg =
-        error.response?.data?.message || "Unable to upload image.";
+      const msg = error.response?.data?.message || "Unable to upload image.";
       setUploadError(msg);
       pushToast("error", "Upload failed", msg);
     } finally {
@@ -789,4 +862,3 @@ const TicketDetails = () => {
 };
 
 export default TicketDetails;
-
