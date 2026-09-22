@@ -68,7 +68,7 @@ const TicketHero = ({ ticket, statusStyle, priorityStyle, comments, activities }
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2.5 lg:flex-col">
-          <QuickStat
+          {/* <QuickStat
             label="Comments"
             value={comments.length}
             icon={<MessageSquare size={13} />}
@@ -79,7 +79,7 @@ const TicketHero = ({ ticket, statusStyle, priorityStyle, comments, activities }
             value={activities.length}
             icon={<Zap size={13} />}
             color="violet"
-          />
+          /> */}
         </div>
       </div>
     </div>
