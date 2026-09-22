@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 
 import PasswordRequirement from "./PasswordRequirement";
+import { Link } from "react-router";
+
 
 function SignupForm({
   register,
@@ -52,18 +54,13 @@ function SignupForm({
               Unable to create account
             </p>
 
-            <p className="truncate text-[10px] text-red-300/80">
-              {error}
-            </p>
+            <p className="truncate text-[10px] text-red-300/80">{error}</p>
           </div>
         </div>
       )}
 
       {/* FORM */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-4 space-y-3"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-3">
         {/* NAME */}
         <div>
           <label
@@ -173,11 +170,7 @@ function SignupForm({
                 className={`
                   pointer-events-none absolute left-3.5 top-1/2
                   z-10 -translate-y-1/2 transition-colors
-                  ${
-                    errors.password
-                      ? "text-red-400"
-                      : "text-slate-500"
-                  }
+                  ${errors.password ? "text-red-400" : "text-slate-500"}
                 `}
               />
 
@@ -202,9 +195,7 @@ function SignupForm({
 
               <button
                 type="button"
-                aria-label={
-                  showPassword ? "Hide password" : "Show password"
-                }
+                aria-label={showPassword ? "Hide password" : "Show password"}
                 onClick={() => setShowPassword(!showPassword)}
                 className="
                   absolute right-1.5 top-1/2 z-10
@@ -214,11 +205,7 @@ function SignupForm({
                   hover:bg-slate-700/60 hover:text-slate-200
                 "
               >
-                {showPassword ? (
-                  <EyeOff size={15} />
-                ) : (
-                  <Eye size={15} />
-                )}
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
 
@@ -244,19 +231,13 @@ function SignupForm({
                 className={`
                   pointer-events-none absolute left-3.5 top-1/2
                   z-10 -translate-y-1/2 transition-colors
-                  ${
-                    errors.confirmPassword
-                      ? "text-red-400"
-                      : "text-slate-500"
-                  }
+                  ${errors.confirmPassword ? "text-red-400" : "text-slate-500"}
                 `}
               />
 
               <input
                 id="confirmPassword"
-                type={
-                  showConfirmPassword ? "text" : "password"
-                }
+                type={showConfirmPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Confirm password"
                 {...register("confirmPassword")}
@@ -276,13 +257,9 @@ function SignupForm({
               <button
                 type="button"
                 aria-label={
-                  showConfirmPassword
-                    ? "Hide password"
-                    : "Show password"
+                  showConfirmPassword ? "Hide password" : "Show password"
                 }
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="
                   absolute right-1.5 top-1/2 z-10
                   flex h-8 w-8 -translate-y-1/2
@@ -291,11 +268,7 @@ function SignupForm({
                   hover:bg-slate-700/60 hover:text-slate-200
                 "
               >
-                {showConfirmPassword ? (
-                  <EyeOff size={15} />
-                ) : (
-                  <Eye size={15} />
-                )}
+                {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
 
@@ -363,10 +336,7 @@ function SignupForm({
                 text="Uppercase"
               />
 
-              <PasswordRequirement
-                active={passwordChecks.match}
-                text="Match"
-              />
+              <PasswordRequirement active={passwordChecks.match} text="Match" />
             </div>
           </div>
         )}
@@ -395,8 +365,8 @@ function SignupForm({
             <span className="font-semibold text-emerald-400">
               terms of service
             </span>{" "}
-            and understand that my account will be created as a
-            customer account.
+            and understand that my account will be created as a customer
+            account.
           </span>
         </label>
 
@@ -426,7 +396,6 @@ function SignupForm({
           ) : (
             <>
               Create Account
-
               <ArrowRight
                 size={16}
                 className="transition-transform duration-200 group-hover:translate-x-1"
@@ -439,12 +408,12 @@ function SignupForm({
       {/* LOGIN */}
       <p className="mt-4 text-center text-xs text-slate-400">
         Already have an account?{" "}
-        <a
-          href="/login"
+        <Link
+          to="/login"
           className="font-bold text-emerald-400 transition hover:text-emerald-300"
         >
           Sign in
-        </a>
+        </Link>
       </p>
 
       {/* SECURITY */}
