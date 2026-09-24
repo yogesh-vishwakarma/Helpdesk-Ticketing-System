@@ -17,6 +17,7 @@ import {
 
 import api from "../../services/axios";
 import usePermission from "../../hooks/usePermission";
+import Toast from "../../Components/TicketDetails/Toast";
 
 const CreateTicket = () => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const CreateTicket = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+   const [toast, setToast] = useState(null);
 
   /* ========================================================
      OPTIONS
@@ -112,13 +114,25 @@ const CreateTicket = () => {
 
       const response = await api.post("/tickets", data);
       console.log("CREATE TICKET RESPONSE:", response.data);
-      navigate("/ticketlist");
+      setToast({
+        id: Date.now(),
+        type: "success",
+        title: "Ticket created",
+        message: response.data.message,
+      });
+
+      setTimeout(() => {
+        navigate("/welcome/tickets");
+      }, 1800);
+
     } catch (error) {
       console.error("CREATE TICKET ERROR:", error);
-      setServerError(
-        error.response?.data?.message ||
-          "Unable to create ticket. Please try again.",
-      );
+      setToast({
+        id: Date.now(),
+        type: "error",
+        title: "Unable to create ticket",
+        message: error.response?.data?.message || "Unable to update ticket.",
+      });
     } finally {
       setLoading(false);
     }
@@ -579,6 +593,16 @@ const CreateTicket = () => {
           </div>
         </form>
       </main>
+
+
+
+       {toast && (
+        <div className="pointer-events-none fixed bottom-5 right-5 z-[9999]">
+          <Toast toast={toast} onDismiss={() => setToast(null)} />
+        </div>
+       )}
+
+
     </div>
   );
 };

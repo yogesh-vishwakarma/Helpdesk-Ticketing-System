@@ -126,7 +126,7 @@ function App() {
         {/* EDIT TICKET */}
 
         <Route
-          path="/welcome/tickets/:ticketId/edit"
+          path="tickets/:ticketId/edit"
           element={
             <ProtectedRoute permission="TICKET_UPDATE">
               <EditTicket />
