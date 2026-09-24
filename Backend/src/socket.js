@@ -7,7 +7,7 @@ const initializeSocket = (server) => {
     cors: {
       origin: ["http://localhost:5173",
       "https://helpdesk-ticketing-frontend.vercel.app",
-      ]
+      ],
       credentials: true,
     },
   });

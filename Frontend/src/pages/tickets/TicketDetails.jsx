@@ -46,7 +46,6 @@ import ActivityTab from "../../Components/TicketDetails/ActivityTab";
 import AssignmentCard from "../../Components/TicketDetails/AssignmentCard";
 import StatusPriorityCard from "../../Components/TicketDetails/StatusPriorityCard";
 import AttachmentsCard from "../../Components/TicketDetails/AttachmentsCard";
-import EditTicketButton from "../../Components/TicketDetails/EditTicketButton";
 import Toast from "../../Components/TicketDetails/Toast";
 
 const TicketDetails = () => {
@@ -832,13 +831,6 @@ const TicketDetails = () => {
               />
             )}
 
-            {canUpdate && (
-              <EditTicketButton
-                ticket={ticket}
-                canUpdate={canUpdate}
-                navigate={navigate}
-              />
-            )}
           </aside>
         </div>
 

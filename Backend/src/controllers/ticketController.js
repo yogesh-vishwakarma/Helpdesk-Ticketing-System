@@ -113,19 +113,24 @@ const getAllTickets = async (req, res) => {
         "i",
       );
 
+      // Find users whose name or email matches the search
+      const users = await User.find({
+        $or: [{ name: searchRegex }, { email: searchRegex }],
+      }).select("_id");
+
+      const userIds = users.map((user) => user._id);
+
       query.$or = [
-        {
-          ticketId: searchRegex,
-        },
-        {
-          title: searchRegex,
-        },
-        {
-          description: searchRegex,
-        },
-        {
-          category: searchRegex,
-        },
+        { ticketId: searchRegex },
+        { title: searchRegex },
+        { description: searchRegex },
+        { category: searchRegex },
+
+        // Search customer name/email
+        { customer: { $in: userIds } },
+
+        // Search assigned agent name/email
+        { assignedAgent: { $in: userIds } },
       ];
     }
 
@@ -520,7 +525,10 @@ const assignTicket = async (req, res) => {
       });
     }
 
-    const Agent = await User.findById(assignedAgent).populate({
+    const Agent = await User.findOne({
+      _id: assignedAgent,
+      isDeleted: false,
+    }).populate({
       path: "role",
       populate: {
         path: "permissions",
@@ -543,16 +551,16 @@ const assignTicket = async (req, res) => {
 
     const ticket = await Ticket.findById(ticketId);
 
-    if (ticket.assignedAgent != null)
-      return res.status(403).json({
-        message: "This Ticket is already assigned to any agent",
-      });
-
     if (!ticket) {
       return res.status(404).json({
         message: "Ticket not found",
       });
     }
+
+    if (ticket.assignedAgent != null)
+      return res.status(403).json({
+        message: "This Ticket is already assigned to any agent",
+      });
 
     ticket.assignedAgent = Agent._id;
     ticket.status = "In Progress";
@@ -589,9 +597,9 @@ const getActivity = async (req, res) => {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
     const isOwner =
-      existTicket.customer._id.toString() === req.result._id.toString();
+      existTicket.customer?._id.toString() === req.result._id.toString();
     const isAssigned =
-      existTicket.assignedAgent._id.toString() === req.result._id.toString();
+      existTicket.assignedAgent?._id.toString() === req.result._id.toString();
 
     const allowed =
       permissions.includes("TICKET_VIEW_ALL") ||

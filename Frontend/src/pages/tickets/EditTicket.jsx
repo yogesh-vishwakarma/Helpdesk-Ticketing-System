@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import axios from "../../services/axios";
+import Toast from "../../Components/TicketDetails/Toast";
 import usePermission from "../../hooks/usePermission";
 
 const EditTicket = () => {
@@ -39,6 +40,8 @@ const EditTicket = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState({});
+
+  const [toast, setToast] = useState(null);
 
   /* ================= OPTIONS ================= */
   const categories = [
@@ -109,10 +112,23 @@ const EditTicket = () => {
       };
       const response = await axios.patch(`/tickets/${ticketId}`, data);
       console.log("UPDATE TICKET RESPONSE:", response.data);
-      navigate(`/tickets/${ticketId}`);
+      setToast({
+        id: Date.now(),
+        type: "success",
+        title: "Ticket updated",
+        message: response.data.message,
+      });
+      setTimeout(() => {
+        navigate(`/welcome/tickets/${ticketId}`);
+      }, 1800);
     } catch (error) {
       console.error("UPDATE TICKET ERROR:", error);
-      setError(error.response?.data?.message || "Unable to update ticket.");
+      setToast({
+        id: Date.now(),
+        type: "error",
+        title: "Unable to update",
+        message: error.response?.data?.message || "Unable to update ticket.",
+      });
     } finally {
       setSaving(false);
     }
@@ -502,22 +518,16 @@ const EditTicket = () => {
                 </div>
               </div>
 
-              {/* CANCEL BUTTON */}
-              <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/tickets/${ticketId}`)}
-                  disabled={saving}
-                  className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] text-sm font-bold text-slate-300 transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ArrowLeft size={16} />
-                  Cancel
-                </button>
-              </div>
             </div>
           </div>
         </form>
       </main>
+
+      {toast && (
+        <div className="pointer-events-none fixed bottom-5 right-5 z-[9999]">
+          <Toast toast={toast} onDismiss={() => setToast(null)} />
+        </div>
+      )}
     </div>
   );
 };

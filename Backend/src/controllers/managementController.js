@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const Role = require("../models/role");
 const User = require("../models/user");
 const Permission = require("../models/permission");
+const Ticket=require("../models/ticket");
 
 //=====================================================
 //PERMISSION MANAGEMENT
@@ -357,7 +358,7 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find()
+    const users = await User.find({isDeleted:false})
       .populate({
         path: "role",
         populate: {
@@ -423,36 +424,96 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+
 const deleteUser = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const {userId}=req.params;
 
-    // Prevent Admin from deleting himself
-    if (req.result._id.toString() === userId) {
-      return res.status(400).json({
-        message: "Admin cannot delete their own account",
-      });
-    }
+    const user= await User.findById(userId);
 
-    const user = await User.findById(userId);
-
-    if (!user) {
+    if(!user){
       return res.status(404).json({
-        message: "User not found",
+        message:"User not found",
+      })
+    }
+
+    if(user.isDeleted){
+      return res.status(400).json({
+        message:"User is already deleted"
       });
     }
 
-    await User.findByIdAndDelete(userId);
+    const linkedTicket=await Ticket.findOne({
+      $or:[
+        {customer:userId},
+        {assignedAgent:userId}
+      ]
+    }).select("ticketId");
+
+    if(linkedTicket){
+      return res.status(400).json({
+        message:"This user is linked to a ticket and cannot be deleted.",
+        ticketId:linkedTicket.ticketId,
+      })
+    }
+
+    user.isDeleted=true;
+    user.deletedAt=new Date();
+
+    await user.save();
 
     return res.status(200).json({
       message: "User deleted successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isDeleted: user.isDeleted,
+        deletedAt: user.deletedAt,
+      },
     });
   } catch (err) {
+     console.error("Delete user error:", err);
+
     return res.status(500).json({
       message: err.message,
     });
   }
 };
+
+
+
+
+// const deleteUser = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+
+//     // Prevent Admin from deleting himself
+//     if (req.result._id.toString() === userId) {
+//       return res.status(400).json({
+//         message: "Admin cannot delete their own account",
+//       });
+//     }
+
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     await User.findByIdAndDelete(userId);
+
+//     return res.status(200).json({
+//       message: "User deleted successfully",
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       message: err.message,
+//     });
+//   }
+// };
 
 module.exports = {
   createRole,

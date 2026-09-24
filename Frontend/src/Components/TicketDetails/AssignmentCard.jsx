@@ -52,7 +52,7 @@ const AssignmentCard = ({ ticket, canAssign }) => (
       </div>
     )}
 
-    {canAssign && (
+    {/* {canAssign && (
       <button
         type="button"
         className="mt-3 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-bold text-slate-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-400/30 hover:bg-indigo-400/10 hover:text-indigo-300"
@@ -61,7 +61,7 @@ const AssignmentCard = ({ ticket, canAssign }) => (
           ? "Change Assignment"
           : "Assign Agent"}
       </button>
-    )}
+    )} */}
   </div>
 </section>
 );

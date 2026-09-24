@@ -291,6 +291,11 @@ const getAgents = async (req, res) => {
 
     const agents = await User.aggregate([
       {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
         $lookup: {
           from: "roles",
           localField: "role",

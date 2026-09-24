@@ -21,7 +21,6 @@ managementRouter.delete("/roles/:roleId",checkPermission("ROLE_DELETE"),deleteRo
 
 // ==================== User Management ====================
 
-// Admin creates a user with any existing role
 managementRouter.post("/user",checkPermission("USER_CREATE"),createUser);
 managementRouter.get("/users",checkPermission("USER_VIEW"),getUsers);
 managementRouter.patch("/users/:userId/role",checkPermission("USER_UPDATE"),updateUserRole);

@@ -40,6 +40,8 @@ function App() {
   },[dispatch,isPublicRoute]);
 
   return (
+  <>
+
     <Routes>
       {/* ================= HOMEPAGE ================= */}
 
@@ -124,7 +126,7 @@ function App() {
         {/* EDIT TICKET */}
 
         <Route
-          path="tickets/:ticketId/edit"
+          path="/welcome/tickets/:ticketId/edit"
           element={
             <ProtectedRoute permission="TICKET_UPDATE">
               <EditTicket />
@@ -177,7 +179,7 @@ function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
+ </> );
 }
 
 export default App;

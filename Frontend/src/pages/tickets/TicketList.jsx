@@ -161,6 +161,9 @@ function TicketList() {
   };
 
   /* ================= EFFECTS ================= */
+
+
+
   useEffect(() => {
     if (!canViewTickets) {
       setLoading(false);
@@ -171,6 +174,7 @@ function TicketList() {
     ticketView,
     canViewTickets,
     page,
+    search,
     status,
     priority,
     category,
@@ -237,31 +241,6 @@ function TicketList() {
     );
   }, [agents, tickets]);
 
-  /* ================= CLIENT SEARCH ================= */
-  const searchedTickets = useMemo(() => {
-    if (!search.trim()) return tickets;
-    const q = search.trim().toLowerCase();
-
-    return tickets.filter((t) => {
-      const ticketId = String(t.ticketId || "").toLowerCase();
-      const title = String(t.title || "").toLowerCase();
-      const description = String(t.description || "").toLowerCase();
-      const customerName = String(t.customer?.name || "").toLowerCase();
-      const customerEmail = String(t.customer?.email || "").toLowerCase();
-      const agentName = String(t.assignedAgent?.name || "").toLowerCase();
-      const agentEmail = String(t.assignedAgent?.email || "").toLowerCase();
-
-      return (
-        ticketId.includes(q) ||
-        title.includes(q) ||
-        description.includes(q) ||
-        customerName.includes(q) ||
-        customerEmail.includes(q) ||
-        agentName.includes(q) ||
-        agentEmail.includes(q)
-      );
-    });
-  }, [tickets, search]);
 
   /* ================= RESULT INFO ================= */
   const totalTickets = pagination.totalTickets || 0;
@@ -289,9 +268,9 @@ function TicketList() {
     Boolean(assignedAgent);
 
   /* ================= RESET PAGE ================= */
-  useEffect(() => {
-    setPage(1);
-  }, [search, status, priority, category, assignedAgent]);
+  // useEffect(() => {
+  //   setPage(1);
+  // }, [search, status, priority, category, assignedAgent]);
 
   /* ================= HANDLERS ================= */
   const handleSearch = () => {
@@ -597,7 +576,7 @@ function TicketList() {
         <div className="w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02]">
           <div className="w-full overflow-x-auto">
             <TicketTable
-              tickets={searchedTickets}
+              tickets={tickets}
               loading={loading}
               onView={handleView}
               onEdit={handleEdit}
