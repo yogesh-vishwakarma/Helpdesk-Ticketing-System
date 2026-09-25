@@ -19,6 +19,7 @@ import TicketFilters from "../../Components/ticketsList/TicketFilters";
 import TicketTable from "../../Components/ticketsList/TicketTable";
 import Pagination from "../../Components/ticketsList/Pagination";
 import DeleteConfirmModal from "../../Components/ticketsList/DeleteConfirmModal";
+import Toast from "../../Components/TicketDetails/Toast";
 
 function TicketList() {
   const navigate = useNavigate();
@@ -63,6 +64,8 @@ function TicketList() {
 
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
+
+  const [toast, setToast] = useState(null);
 
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -162,8 +165,6 @@ function TicketList() {
 
   /* ================= EFFECTS ================= */
 
-
-
   useEffect(() => {
     if (!canViewTickets) {
       setLoading(false);
@@ -240,7 +241,6 @@ function TicketList() {
       a.name.localeCompare(b.name),
     );
   }, [agents, tickets]);
-
 
   /* ================= RESULT INFO ================= */
   const totalTickets = pagination.totalTickets || 0;
@@ -333,13 +333,29 @@ function TicketList() {
 
       await axios.delete(`/tickets/${deleteTarget._id}`);
 
+      setToast({
+        type: "success",
+        title: "Ticket deleted successfully.",
+      });
+      setTimeout(() => {
+      setToast(null);
+    }, 3000);
+
       await fetchTickets(page);
       if (canViewAgents) await fetchAgents();
 
       setDeleteTarget(null);
     } catch (err) {
       console.error("DELETE TICKET ERROR:", err);
-      setDeleteError(err.response?.data?.message || "Unable to delete ticket.");
+      const message = err.response?.data?.message || "Unable to delete ticket.";
+
+      setDeleteError(message);
+      // ERROR TOAST
+      setToast({
+        type: "error",
+        title: "Delete failed",
+        message,
+      });
     } finally {
       setDeleting(false);
     }
@@ -373,254 +389,259 @@ function TicketList() {
 
   /* ================= RENDER ================= */
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-slate-950 text-slate-100">
-      {/* ✅ Background glows — contained, subtle, no side bleed */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/4 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-emerald-500/[0.07] blur-[140px]" />
-        <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/[0.05] blur-[140px]" />
-      </div>
+    <>
+      <div className="relative min-h-screen w-full overflow-x-hidden bg-slate-950 text-slate-100">
+        {/* ✅ Background glows — contained, subtle, no side bleed */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/4 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-emerald-500/[0.07] blur-[140px]" />
+          <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/[0.05] blur-[140px]" />
+        </div>
 
-      {/* ✅ Grid pattern removed side white edges by using inset-x-0 and low opacity */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)",
-          backgroundSize: "42px 42px",
-          maskImage:
-            "radial-gradient(ellipse at center, black 40%, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at center, black 40%, transparent 80%)",
-        }}
-      />
+        {/* ✅ Grid pattern removed side white edges by using inset-x-0 and low opacity */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)",
+            backgroundSize: "42px 42px",
+            maskImage:
+              "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+          }}
+        />
 
-      {/* ✅ Main content — fixed max-width container, centered, consistent width */}
-      <div className="relative mx-auto w-full max-w-[1400px] min-w-0 px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
-        {/* ============ PAGE HEADER ============ */}
-        <div className="mb-4 sm:mb-6">
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.03] shadow-2xl shadow-black/30 backdrop-blur-xl">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+        {/* ✅ Main content — fixed max-width container, centered, consistent width */}
+        <div className="relative mx-auto w-full max-w-[1400px] min-w-0 px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
+          {/* ============ PAGE HEADER ============ */}
+          <div className="mb-4 sm:mb-6">
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.03] shadow-2xl shadow-black/30 backdrop-blur-xl">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
 
-            <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-emerald-400/10 blur-[100px]" />
-            <div className="pointer-events-none absolute -bottom-32 left-1/4 h-72 w-72 rounded-full bg-cyan-400/[0.07] blur-[100px]" />
+              <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-emerald-400/10 blur-[100px]" />
+              <div className="pointer-events-none absolute -bottom-32 left-1/4 h-72 w-72 rounded-full bg-cyan-400/[0.07] blur-[100px]" />
 
-            <div className="relative flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:p-7">
-              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-400/30 sm:h-14 sm:w-14">
-                  <Ticket size={27} strokeWidth={2} className="text-white" />
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-emerald-300 ring-1 ring-emerald-400/40">
-                    {totalTickets > 99 ? "99+" : totalTickets}
-                  </span>
-                </div>
-
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl lg:text-3xl">
-                      Tickets
-                    </h1>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300 backdrop-blur-sm">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
-                      Live
+              <div className="relative flex min-w-0 flex-col gap-4 p-4 sm:gap-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:p-7">
+                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-400/30 sm:h-14 sm:w-14">
+                    <Ticket size={27} strokeWidth={2} className="text-white" />
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-emerald-300 ring-1 ring-emerald-400/40">
+                      {totalTickets > 99 ? "99+" : totalTickets}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs leading-5 text-slate-400 sm:text-sm lg:text-base">
-                    Manage, track and resolve support requests.
-                  </p>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl lg:text-3xl">
+                        Tickets
+                      </h1>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300 backdrop-blur-sm">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
+                        Live
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-slate-400 sm:text-sm lg:text-base">
+                      Manage, track and resolve support requests.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                <button
-                  type="button"
-                  onClick={handleRefresh}
-                  disabled={loading || refreshing}
-                  className="group flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-slate-300 shadow-sm backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-400/30 hover:bg-white/[0.07] hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                >
-                  <RefreshCw
-                    size={17}
-                    className={
-                      loading || refreshing
-                        ? "animate-spin"
-                        : "transition-transform duration-300 group-hover:rotate-180"
-                    }
-                  />
-                  <span>Refresh</span>
-                </button>
-
-                {canCreateTicket && (
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                   <button
                     type="button"
-                    onClick={() => navigate("/welcome/tickets/create")}
-                    className="group flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-teal-500 hover:shadow-xl hover:shadow-emerald-500/50 sm:flex-none"
+                    onClick={handleRefresh}
+                    disabled={loading || refreshing}
+                    className="group flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-slate-300 shadow-sm backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-400/30 hover:bg-white/[0.07] hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                   >
-                    <Plus
-                      size={18}
-                      className="transition-transform duration-300 group-hover:rotate-90"
+                    <RefreshCw
+                      size={17}
+                      className={
+                        loading || refreshing
+                          ? "animate-spin"
+                          : "transition-transform duration-300 group-hover:rotate-180"
+                      }
                     />
-                    <span>Create Ticket</span>
+                    <span>Refresh</span>
                   </button>
-                )}
+
+                  {canCreateTicket && (
+                    <button
+                      type="button"
+                      onClick={() => navigate("/welcome/tickets/create")}
+                      className="group flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-teal-500 hover:shadow-xl hover:shadow-emerald-500/50 sm:flex-none"
+                    >
+                      <Plus
+                        size={18}
+                        className="transition-transform duration-300 group-hover:rotate-90"
+                      />
+                      <span>Create Ticket</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ============ OVERVIEW ============ */}
-        <div
-          className={`mb-5 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 ${
-            canViewAgents ? "lg:grid-cols-3" : "lg:grid-cols-2"
-          }`}
-        >
-          <OverviewCard
-            icon={<Ticket size={20} />}
-            label="Total Tickets"
-            value={totalTickets}
-            description="Available tickets"
-            accent="slate"
-          />
-          <OverviewCard
-            icon={<Inbox size={20} />}
-            label="Current Page"
-            value={`${page} / ${totalPages}`}
-            description={`${tickets.length} tickets loaded`}
-            accent="emerald"
-          />
-          {canViewAgents && (
+          {/* ============ OVERVIEW ============ */}
+          <div
+            className={`mb-5 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 ${
+              canViewAgents ? "lg:grid-cols-3" : "lg:grid-cols-2"
+            }`}
+          >
             <OverviewCard
-              icon={<Users size={20} />}
-              label="Available Agents"
-              value={agentOptions.length}
-              description="Agents available for assignment"
-              accent="indigo"
+              icon={<Ticket size={20} />}
+              label="Total Tickets"
+              value={totalTickets}
+              description="Available tickets"
+              accent="slate"
+            />
+            <OverviewCard
+              icon={<Inbox size={20} />}
+              label="Current Page"
+              value={`${page} / ${totalPages}`}
+              description={`${tickets.length} tickets loaded`}
+              accent="emerald"
+            />
+            {canViewAgents && (
+              <OverviewCard
+                icon={<Users size={20} />}
+                label="Available Agents"
+                value={agentOptions.length}
+                description="Agents available for assignment"
+                accent="indigo"
+              />
+            )}
+          </div>
+
+          {/* ============ SEARCH + FILTERS ============ */}
+          <div className="mb-5 w-full min-w-0">
+            <TicketFilters
+              searchInput={searchInput}
+              setSearchInput={setSearchInput}
+              status={status}
+              setStatus={setStatus}
+              priority={priority}
+              setPriority={setPriority}
+              category={category}
+              setCategory={setCategory}
+              assignedAgent={assignedAgent}
+              setAssignedAgent={setAssignedAgent}
+              categories={categories}
+              agentOptions={agentOptions}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              sortOrder={sortOrder}
+              onSortOrder={handleSortOrder}
+              onSearch={handleSearch}
+              onClear={handleClearFilters}
+              canViewAgents={canViewAgents}
+              activeFilterCount={activeFilterCount}
+            />
+          </div>
+          {/* TOAST */}
+          {toast && <Toast toast={toast} onDismiss={() => setToast(null)} />}
+
+          {/* ============ ERROR ============ */}
+          {error && (
+            <div className="mb-5 flex items-start gap-3 overflow-hidden rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-4 text-sm text-red-200 shadow-lg backdrop-blur-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 ring-1 ring-red-400/20">
+                <AlertCircle size={18} className="text-red-300" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-red-200">Something went wrong</p>
+                <p className="mt-0.5 text-red-300/80">{error}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setError("")}
+                className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-red-400 transition hover:bg-red-500/20 hover:text-red-200"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          )}
+
+          {/* ============ RESULT SUMMARY ============ */}
+          <div className="mb-4 flex min-w-0 flex-col gap-3 mt-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] shadow-sm backdrop-blur-sm">
+                <SlidersHorizontal size={17} className="text-slate-400" />
+              </div>
+              <p className="min-w-0 text-xs text-slate-400 sm:text-sm">
+                Showing{" "}
+                <span className="font-bold text-white">{startIndex}</span> –{" "}
+                <span className="font-bold text-white">{endIndex}</span> of{" "}
+                <span className="font-bold text-white">{totalTickets}</span>{" "}
+                tickets
+              </p>
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex w-fit items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-4 py-2 text-xs font-semibold text-emerald-300 backdrop-blur-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                </span>
+                {activeFilterCount > 0
+                  ? `${activeFilterCount} filter${
+                      activeFilterCount > 1 ? "s" : ""
+                    } active`
+                  : "Search active"}
+              </div>
+            )}
+          </div>
+
+          {/* ============ TABLE ============ */}
+          {/* ✅ No forced min-width on page. Table scrolls inside its own container. */}
+          <div className="w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02]">
+            <div className="w-full overflow-x-auto">
+              <TicketTable
+                tickets={tickets}
+                loading={loading}
+                onView={handleView}
+                onEdit={handleEdit}
+                onAssign={handleAssign}
+                onDelete={handleDelete}
+                canSeeAssignedAgent={canViewAll || canViewOwn}
+                canAssign={canAssign}
+                canUpdate={canUpdate}
+                canDelete={canDeleteTicket}
+                canUpdateStatus={canUpdateStatus}
+                canUpdatePriority={canUpdatePriority}
+              />
+            </div>
+          </div>
+
+          {/* ============ PAGINATION ============ */}
+          {!loading && totalTickets > 0 && (
+            <Pagination
+              page={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalTickets={pagination.totalTickets}
+              limit={pagination.limit}
+              hasNextPage={pagination.hasNextPage}
+              hasPreviousPage={pagination.hasPreviousPage}
+              onPrevious={() => setPage((c) => Math.max(c - 1, 1))}
+              onNext={() =>
+                setPage((c) => Math.min(c + 1, pagination.totalPages))
+              }
+              onPageChange={(p) => setPage(p)}
             />
           )}
         </div>
 
-        {/* ============ SEARCH + FILTERS ============ */}
-        <div className="mb-5 w-full min-w-0">
-          <TicketFilters
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            status={status}
-            setStatus={setStatus}
-            priority={priority}
-            setPriority={setPriority}
-            category={category}
-            setCategory={setCategory}
-            assignedAgent={assignedAgent}
-            setAssignedAgent={setAssignedAgent}
-            categories={categories}
-            agentOptions={agentOptions}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            sortOrder={sortOrder}
-            onSortOrder={handleSortOrder}
-            onSearch={handleSearch}
-            onClear={handleClearFilters}
-            canViewAgents={canViewAgents}
-            activeFilterCount={activeFilterCount}
-          />
-        </div>
-
-        {/* ============ ERROR ============ */}
-        {error && (
-          <div className="mb-5 flex items-start gap-3 overflow-hidden rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-4 text-sm text-red-200 shadow-lg backdrop-blur-sm">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/20 ring-1 ring-red-400/20">
-              <AlertCircle size={18} className="text-red-300" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-red-200">Something went wrong</p>
-              <p className="mt-0.5 text-red-300/80">{error}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setError("")}
-              className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-red-400 transition hover:bg-red-500/20 hover:text-red-200"
-            >
-              <X size={15} />
-            </button>
-          </div>
-        )}
-
-        {/* ============ RESULT SUMMARY ============ */}
-        <div className="mb-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] shadow-sm backdrop-blur-sm">
-              <SlidersHorizontal size={17} className="text-slate-400" />
-            </div>
-            <p className="min-w-0 text-xs text-slate-400 sm:text-sm">
-              Showing <span className="font-bold text-white">{startIndex}</span>{" "}
-              – <span className="font-bold text-white">{endIndex}</span> of{" "}
-              <span className="font-bold text-white">{totalTickets}</span>{" "}
-              tickets
-            </p>
-          </div>
-
-          {hasActiveFilters && (
-            <div className="flex w-fit items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-4 py-2 text-xs font-semibold text-emerald-300 backdrop-blur-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              {activeFilterCount > 0
-                ? `${activeFilterCount} filter${
-                    activeFilterCount > 1 ? "s" : ""
-                  } active`
-                : "Search active"}
-            </div>
-          )}
-        </div>
-
-        {/* ============ TABLE ============ */}
-        {/* ✅ No forced min-width on page. Table scrolls inside its own container. */}
-        <div className="w-full min-w-0 overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02]">
-          <div className="w-full overflow-x-auto">
-            <TicketTable
-              tickets={tickets}
-              loading={loading}
-              onView={handleView}
-              onEdit={handleEdit}
-              onAssign={handleAssign}
-              onDelete={handleDelete}
-              canSeeAssignedAgent={canViewAll || canViewOwn}
-              canAssign={canAssign}
-              canUpdate={canUpdate}
-              canDelete={canDeleteTicket}
-              canUpdateStatus={canUpdateStatus}
-              canUpdatePriority={canUpdatePriority}
-            />
-          </div>
-        </div>
-
-        {/* ============ PAGINATION ============ */}
-        {!loading && totalTickets > 0 && (
-          <Pagination
-            page={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            totalTickets={pagination.totalTickets}
-            limit={pagination.limit}
-            hasNextPage={pagination.hasNextPage}
-            hasPreviousPage={pagination.hasPreviousPage}
-            onPrevious={() => setPage((c) => Math.max(c - 1, 1))}
-            onNext={() =>
-              setPage((c) => Math.min(c + 1, pagination.totalPages))
-            }
-            onPageChange={(p) => setPage(p)}
+        {/* ============ DELETE CONFIRMATION MODAL ============ */}
+        {deleteTarget && (
+          <DeleteConfirmModal
+            ticket={deleteTarget}
+            loading={deleting}
+            error={deleteError}
+            onCancel={closeDeleteModal}
+            onConfirm={confirmDelete}
           />
         )}
       </div>
-
-      {/* ============ DELETE CONFIRMATION MODAL ============ */}
-      {deleteTarget && (
-        <DeleteConfirmModal
-          ticket={deleteTarget}
-          loading={deleting}
-          error={deleteError}
-          onCancel={closeDeleteModal}
-          onConfirm={confirmDelete}
-        />
-      )}
-    </div>
+    </>
   );
 }
 

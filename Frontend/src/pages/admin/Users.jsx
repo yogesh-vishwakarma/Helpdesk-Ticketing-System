@@ -349,12 +349,6 @@ const Users = () => {
           permissionsCount={0}
         />
 
-        <AdminError
-          error={error}
-          visible={!!error && !showUserModal && !showDeleteModal}
-          onDismiss={() => setError("")}
-        />
-
         <UsersSection
           users={users}
           userSearch={userSearch}

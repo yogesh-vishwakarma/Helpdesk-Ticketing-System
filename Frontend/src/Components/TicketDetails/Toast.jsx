@@ -5,11 +5,16 @@ const Toast = ({ toast, onDismiss }) => {
 
   return (
     <div
-      className={`pointer-events-auto flex items-start gap-3 rounded-2xl border p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
-        isSuccess
-          ? "border-emerald-400/30 bg-slate-900/95 shadow-emerald-500/20"
-          : "border-red-500/30 bg-slate-900/95 shadow-red-500/20"
-      }`}
+      className={`pointer-events-auto flex items-start gap-3 rounded-2xl border p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 fixed
+    bottom-6
+    right-6
+    z-[9999]
+    w-[calc(100%-2rem)]
+    max-w-md ${
+      isSuccess
+        ? "border-emerald-400/30 bg-slate-900/95 shadow-emerald-500/20"
+        : "border-red-500/30 bg-slate-900/95 shadow-red-500/20"
+    }`}
     >
       <div
         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ${

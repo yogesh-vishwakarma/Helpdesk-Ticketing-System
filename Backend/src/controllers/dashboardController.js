@@ -5,14 +5,14 @@ const getDashboardSummary = async (req, res) => {
   try {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-    let query = {};
+    let query = {isDeleted: false};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
-      query = {};
+      query = {isDeleted: false};
     } else if (permissions.includes("TICKET_VIEW_ASSIGNED")) {
-      query = { assignedAgent: req.result._id };
+      query = { isDeleted: false, assignedAgent: req.result._id };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { customer: req.result._id };
+      query = { isDeleted: false, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view dashboard",
@@ -70,11 +70,11 @@ const getTicketsByStatus = async (req, res) => {
     let query = {};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
-      query = {};
+      query = {isDeleted: false};
     } else if (permissions.includes("TICKET_VIEW_ASSIGNED")) {
-      query = { assignedAgent: req.result._id };
+      query = {isDeleted: false, assignedAgent: req.result._id };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { customer: req.result._id };
+      query = {isDeleted: false, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view tickets",
@@ -116,14 +116,14 @@ const getTicketsByPriority = async (req, res) => {
   try {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-    let query = {};
+    let query = {isDeleted: false};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
       query = {};
     } else if (permissions.includes("TICKET_VIEW_ASSIGNED")) {
-      query = { assignedAgent: req.result._id };
+      query = {isDeleted: false, assignedAgent: req.result._id };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { customer: req.result._id };
+      query = {isDeleted: false, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view tickets",
@@ -168,11 +168,11 @@ const getTicketsByCategory = async (req, res) => {
     let query = {};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
-      query = {};
+      query = {isDeleted: false};
     } else if (permissions.includes("TICKET_VIEW_ASSIGNED")) {
-      query = { assignedAgent: req.result._id };
+      query = {isDeleted: false, assignedAgent: req.result._id };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { customer: req.result._id };
+      query = {isDeleted: false, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view tickets",
@@ -214,14 +214,14 @@ const getTicketRecent = async (req, res) => {
   try {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-    let query = {};
+    let query = {isDeleted: false};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
-      query = {};
+      query = {isDeleted: false};
     } else if (permissions.includes("TICKET_VIEW_ASSIGNED")) {
-      query = { assignedAgent: req.result._id };
+      query = {isDeleted: false, assignedAgent: req.result._id };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { customer: req.result._id };
+      query = {isDeleted: false, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view tickets",
@@ -250,12 +250,12 @@ const getUnassignedTickets = async (req, res) => {
   try {
     const permissions = req.result.role.permissions.map((p) => p.name);
 
-    let query = {};
+    let query = {isDeleted: false};
 
     if (permissions.includes("TICKET_VIEW_ALL")) {
-      query = { assignedAgent: null };
+      query = {isDeleted: false, assignedAgent: null };
     } else if (permissions.includes("TICKET_VIEW_OWN")) {
-      query = { assignedAgent: null, customer: req.result._id };
+      query = {isDeleted: false, assignedAgent: null, customer: req.result._id };
     } else {
       return res.status(403).json({
         message: "You are not allowed to view tickets",

@@ -159,7 +159,7 @@ function TicketFilters({
               >
                 <option value="">All Assigned Agents</option>
                 {agentOptions.map((agent) => (
-                  <option key={agent.email} value={agent.email}>
+                  <option key={agent._idl} value={agent._id}>
                     {agent.name} — {agent.email}
                   </option>
                 ))}

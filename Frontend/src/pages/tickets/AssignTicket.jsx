@@ -20,6 +20,7 @@ import {
 
 import axios from "../../services/axios";
 import usePermission from "../../hooks/usePermission";
+import Toast from "../../Components/TicketDetails/Toast";
 
 const AssignTicket = () => {
   const navigate = useNavigate();
@@ -39,6 +40,8 @@ const AssignTicket = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [toasts, setToasts] = useState([]);
 
   /* ================= FETCH ================= */
   const fetchData = async () => {
@@ -96,13 +99,40 @@ const AssignTicket = () => {
 
       setSuccess("Ticket assigned successfully.");
 
-      setTimeout(() => {
-        navigate("/ticketlist");
-      }, 1000);
-    } catch (err) {
-      console.error("ASSIGN TICKET ERROR:", err);
+      setToasts((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: "success",
+          title: "Ticket assigned successfully.",
+        },
+      ]);
 
-      setError(err.response?.data?.message || "Unable to assign ticket.");
+      setTimeout(() => {
+        navigate("/welcome/tickets");
+      }, 1000);
+
+      setTimeout(() => {
+        setToasts((prev) => prev.slice(1));
+      }, 3000);
+    } catch (err) {
+      const message = err.response?.data?.message || "Unable to assign ticket.";
+
+      setError("");
+
+      setToasts((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: "error",
+          title: "Assignment failed",
+          message,
+        },
+      ]);
+
+      setTimeout(() => {
+        setToasts((prev) => prev.slice(1));
+      }, 3000);
     } finally {
       setAssigning(false);
     }
@@ -650,6 +680,16 @@ const AssignTicket = () => {
           </span>
         </div>
       </div>
+
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          toast={toast}
+          onDismiss={() => {
+            setToasts((prev) => prev.filter((item) => item.id !== toast.id));
+          }}
+        />
+      ))}
     </div>
   );
 };
