@@ -1,5 +1,6 @@
 import { Navigate } from "react-router";
 import { useSelector } from "react-redux";
+import LoadingState from "./LoadingState";
 
 const ProtectedRoute = ({
   children,
@@ -14,11 +15,7 @@ const ProtectedRoute = ({
 
   // Wait for authentication check
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <LoadingState />
   }
 
   // Not logged in

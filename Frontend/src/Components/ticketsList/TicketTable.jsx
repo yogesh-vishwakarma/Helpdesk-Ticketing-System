@@ -17,6 +17,7 @@ function TicketTable({
   canAssign,
   canUpdate,
   canDelete,
+  
 }) {
   if (loading) {
     return (

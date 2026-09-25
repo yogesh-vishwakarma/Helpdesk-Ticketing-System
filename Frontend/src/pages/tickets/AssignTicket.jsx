@@ -175,35 +175,126 @@ const AssignTicket = () => {
   /* ================= LOADING ================= */
   if (loading) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-slate-950">
+      <div className="relative min-h-full overflow-hidden bg-slate-950">
+        {/* Background glow */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-48 -top-48 h-[500px] w-[500px] rounded-full bg-emerald-500/15 blur-[120px]" />
-          <div className="absolute -right-48 top-20 h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[120px]" />
+          <div className="absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full bg-emerald-500/[0.08] blur-[110px]" />
+
+          <div className="absolute -right-40 top-10 h-[420px] w-[420px] rounded-full bg-cyan-500/[0.06] blur-[110px]" />
+
+          <div className="absolute bottom-[-200px] left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-teal-500/[0.04] blur-[120px]" />
         </div>
 
+        {/* Page content */}
         <div className="relative mx-auto w-full max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
-          <div className="animate-pulse space-y-5">
-            <div className="h-5 w-24 rounded bg-white/[0.05]" />
-            <div className="h-10 w-64 rounded-lg bg-white/[0.05]" />
-            <div className="h-5 w-80 rounded bg-white/[0.05]" />
+          {/* Header skeleton */}
+          <div className="mb-7 space-y-3">
+            <div className="h-4 w-24 animate-pulse rounded-md bg-white/[0.06]" />
 
-            <div className="grid gap-5 lg:grid-cols-2">
-              <div className="h-72 rounded-3xl border border-white/[0.06] bg-white/[0.02]" />
-              <div className="h-72 rounded-3xl border border-white/[0.06] bg-white/[0.02]" />
+            <div className="h-9 w-64 animate-pulse rounded-xl bg-white/[0.07]" />
+
+            <div className="h-4 w-80 max-w-full animate-pulse rounded-md bg-white/[0.04]" />
+          </div>
+
+          {/* Main skeleton */}
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {/* Ticket information */}
+            <div className="rounded-3xl border border-white/[0.07] bg-white/[0.025] p-6 shadow-2xl shadow-black/20">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="h-11 w-11 animate-pulse rounded-2xl bg-emerald-400/[0.08]" />
+
+                <div className="space-y-2">
+                  <div className="h-5 w-36 animate-pulse rounded-md bg-white/[0.07]" />
+
+                  <div className="h-3 w-48 animate-pulse rounded-md bg-white/[0.04]" />
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                {/* Title */}
+                <div>
+                  <div className="mb-2 h-3 w-20 animate-pulse rounded bg-white/[0.05]" />
+
+                  <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <div className="mb-2 h-3 w-24 animate-pulse rounded bg-white/[0.05]" />
+
+                  <div className="h-32 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <div className="mb-2 h-3 w-20 animate-pulse rounded bg-white/[0.05]" />
+
+                  <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Assignment panel */}
+            <div className="rounded-3xl border border-white/[0.07] bg-white/[0.025] p-6 shadow-2xl shadow-black/20">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="h-11 w-11 animate-pulse rounded-2xl bg-cyan-400/[0.08]" />
+
+                <div className="space-y-2">
+                  <div className="h-5 w-32 animate-pulse rounded-md bg-white/[0.07]" />
+
+                  <div className="h-3 w-44 animate-pulse rounded-md bg-white/[0.04]" />
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <div className="mb-2 h-3 w-28 animate-pulse rounded bg-white/[0.05]" />
+
+                  <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+                </div>
+
+                <div>
+                  <div className="mb-2 h-3 w-24 animate-pulse rounded bg-white/[0.05]" />
+
+                  <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+                </div>
+
+                <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.05]" />
+              </div>
             </div>
           </div>
 
-          <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
-            <div className="rounded-2xl border border-white/[0.08] bg-slate-900/90 px-6 py-5 text-center shadow-2xl backdrop-blur-xl">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/20">
-                <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+          {/* Loading overlay */}
+          <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div className="relative w-full max-w-xs overflow-hidden rounded-3xl border border-white/[0.10] bg-slate-900/90 p-7 text-center shadow-2xl shadow-black/50 backdrop-blur-2xl">
+              {/* Top accent */}
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
+
+              {/* Glow */}
+              <div className="pointer-events-none absolute left-1/2 top-8 h-24 w-24 -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+
+              {/* Spinner */}
+              <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/20">
+                <Loader2 className="h-7 w-7 animate-spin text-emerald-400" />
               </div>
-              <p className="mt-3 text-sm font-bold text-white">
-                Loading ticket
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Preparing assignment details...
-              </p>
+
+              {/* Text */}
+              <div className="relative mt-5">
+                <p className="text-base font-bold tracking-tight text-white">
+                  Loading ticket
+                </p>
+
+                <p className="mt-1.5 text-xs leading-5 text-slate-400">
+                  Preparing assignment details...
+                </p>
+              </div>
+
+              {/* Loading dots */}
+              <div className="mt-5 flex items-center justify-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 [animation-delay:300ms]" />
+              </div>
             </div>
           </div>
         </div>

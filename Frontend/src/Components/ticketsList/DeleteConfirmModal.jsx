@@ -206,7 +206,7 @@ function DeleteConfirmModal({ ticket, loading, error, onCancel, onConfirm }) {
           >
             Are you sure you want to delete{" "}
             <span className="font-semibold text-white">
-              {ticket?.title || ticket?.ticketId}
+              {ticket?.ticketId}
             </span>
             ?
           </p>

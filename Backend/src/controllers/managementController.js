@@ -444,6 +444,7 @@ const deleteUser = async (req, res) => {
     }
 
     const linkedTicket=await Ticket.findOne({
+      isDeleted: false,
       $or:[
         {customer:userId},
         {assignedAgent:userId}
@@ -480,40 +481,6 @@ const deleteUser = async (req, res) => {
     });
   }
 };
-
-
-
-
-// const deleteUser = async (req, res) => {
-//   try {
-//     const { userId } = req.params;
-
-//     // Prevent Admin from deleting himself
-//     if (req.result._id.toString() === userId) {
-//       return res.status(400).json({
-//         message: "Admin cannot delete their own account",
-//       });
-//     }
-
-//     const user = await User.findById(userId);
-
-//     if (!user) {
-//       return res.status(404).json({
-//         message: "User not found",
-//       });
-//     }
-
-//     await User.findByIdAndDelete(userId);
-
-//     return res.status(200).json({
-//       message: "User deleted successfully",
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       message: err.message,
-//     });
-//   }
-// };
 
 module.exports = {
   createRole,
