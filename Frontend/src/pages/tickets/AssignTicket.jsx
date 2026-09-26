@@ -161,7 +161,7 @@ const AssignTicket = () => {
             </p>
             <button
               type="button"
-              onClick={() => navigate("/ticketlist")}
+              onClick={() => navigate("/welcome/tickets")}
               className="mt-7 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-teal-500"
             >
               Back to Tickets
@@ -325,7 +325,7 @@ const AssignTicket = () => {
             </p>
             <button
               type="button"
-              onClick={() => navigate("/ticketlist")}
+              onClick={() => navigate("/welcome/tickets")}
               className="mt-7 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-teal-500"
             >
               Back to Tickets
