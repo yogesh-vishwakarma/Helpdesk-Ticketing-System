@@ -28,7 +28,7 @@ const ProtectedRoute = ({
     permission &&
     !userPermissions.includes(permission)
   ) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/welcome/tickets" replace />;
   }
 
   // Multiple permissions
@@ -39,7 +39,7 @@ const ProtectedRoute = ({
       userPermissions.includes(requiredPermission)
     )
   ) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/welcome/tickets" replace />;
   }
 
   return children;

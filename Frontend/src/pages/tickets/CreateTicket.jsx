@@ -1022,11 +1022,8 @@ const CreateTicket = () => {
                   >
                     {loading ? (
                       <>
-                        <span className="loading loading-spinner loading-sm" />
-
-                        {uploading
-                          ? `Uploading ${uploadProgress}%`
-                          : "Creating..."}
+                      <span className="loading loading-spinner loading-sm" />
+                          Creating...
                       </>
                     ) : (
                       <>

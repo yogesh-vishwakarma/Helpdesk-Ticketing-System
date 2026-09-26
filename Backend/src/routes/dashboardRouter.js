@@ -5,15 +5,14 @@ const {checkPermission,checkAnyPermission} = require("../middleware/permissionmi
 const {getDashboardSummary,getTicketsByStatus,getTicketsByPriority,getTicketsByCategory,getTicketRecent,getUnassignedTickets,getAgents}=require("../controllers/dashboardController")
 
 dashboardRouter.use(userMiddleware);
-dashboardRouter.use(checkPermission("DASHBOARD_VIEW"))
 
 
-dashboardRouter.get("/",getDashboardSummary);
-dashboardRouter.get("/tickets/status",getTicketsByStatus);
-dashboardRouter.get("/tickets/priority",getTicketsByPriority);
-dashboardRouter.get("/tickets/category",getTicketsByCategory);
-dashboardRouter.get("/tickets/recent",getTicketRecent);
-dashboardRouter.get("/tickets/unassigned",getUnassignedTickets);
-dashboardRouter.get("/agents",getAgents);
+dashboardRouter.get("/",checkPermission("DASHBOARD_VIEW"),getDashboardSummary);
+dashboardRouter.get("/tickets/status",checkPermission("DASHBOARD_VIEW"),getTicketsByStatus);
+dashboardRouter.get("/tickets/priority",checkPermission("DASHBOARD_VIEW"),getTicketsByPriority);
+dashboardRouter.get("/tickets/category",checkPermission("DASHBOARD_VIEW"),getTicketsByCategory);
+dashboardRouter.get("/tickets/recent",checkPermission("DASHBOARD_VIEW"),getTicketRecent);
+dashboardRouter.get("/tickets/unassigned",checkPermission("DASHBOARD_VIEW"),getUnassignedTickets);
+dashboardRouter.get("/agents",checkPermission("AGENT_VIEW"),getAgents);
 
 module.exports=dashboardRouter;
