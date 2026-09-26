@@ -118,6 +118,7 @@ function TicketTable({
             onAssign={onAssign}
             onDelete={onDelete}
             canSeeAssignedAgent={canSeeAssignedAgent}
+            canSeeCustomer={canSeeCustomer}
             canAssign={canAssign}
             canUpdate={canUpdate}
             canDelete={canDelete}

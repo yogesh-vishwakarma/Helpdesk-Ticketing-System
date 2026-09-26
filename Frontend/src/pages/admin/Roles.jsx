@@ -386,11 +386,11 @@ const Roles = () => {
           permissionsCount={permissions.length}
         />
 
-        <AdminError
+        {/* <AdminError
           error={error}
           visible={!!error && !showRoleModal && !showDeleteModal}
           onDismiss={() => setError("")}
-        />
+        /> */}
 
         <RolesSection
           roles={roles}
@@ -413,7 +413,7 @@ const Roles = () => {
         savingRole={savingRole}
         setShowRoleModal={setShowRoleModal}
         setSelectedRole={setSelectedRole}
-        error={error}
+        // error={error}
         handleCreateRole={handleCreateRole}
         handleUpdateRole={handleUpdateRole}
         roleForm={roleForm}
@@ -426,6 +426,7 @@ const Roles = () => {
         modalPermGroup={modalPermGroup}
         setModalPermGroup={setModalPermGroup}
         togglePermission={togglePermission}
+        setRoleForm={setRoleForm}
       />
 
       <DeleteModal

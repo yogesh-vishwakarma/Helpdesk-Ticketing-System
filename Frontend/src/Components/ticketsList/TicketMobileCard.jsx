@@ -12,6 +12,7 @@ function TicketMobileCard({
   onAssign,
   onDelete,
   canSeeAssignedAgent,
+  canSeeCustomer,
   canAssign,
   canUpdate,
   canDelete,
@@ -38,10 +39,16 @@ function TicketMobileCard({
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-5 p-4">
-        <MobileInfo
+        {/* <MobileInfo
           label="Customer"
           value={ticket.customer?.name || "Unknown"}
-        />
+        /> */}
+        {canSeeCustomer && (
+          <MobileInfo
+            label="Customer"
+            value={ticket.customer?.name || "Unknown"}
+          />
+        )}
         <MobileInfo label="Category" value={ticket.category || "-"} />
         <div>
           <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
@@ -57,13 +64,21 @@ function TicketMobileCard({
         )}
       </div>
 
-      {ticket.customer?.email && (
+      {canSeeCustomer && ticket.customer?.email && (
         <div className="px-4 pb-3">
           <p className="truncate text-xs text-slate-500">
             Customer: {ticket.customer.email}
           </p>
         </div>
       )}
+
+      {/* {ticket.customer?.email && (
+        <div className="px-4 pb-3">
+          <p className="truncate text-xs text-slate-500">
+            Customer: {ticket.customer.email}
+          </p>
+        </div>
+      )} */}
 
       {canSeeAssignedAgent && ticket.assignedAgent?.email && (
         <div className="px-4 pb-3">
@@ -110,6 +125,5 @@ function TicketMobileCard({
     </div>
   );
 }
-
 
 export default TicketMobileCard;

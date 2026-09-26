@@ -19,7 +19,7 @@ const RoleModal = ({
   savingRole,
   setShowRoleModal,
   setSelectedRole,
-  error,
+  //error,
   handleCreateRole,
   handleUpdateRole,
   roleForm,
@@ -54,13 +54,13 @@ const RoleModal = ({
         onSubmit={modalMode === "create" ? handleCreateRole : handleUpdateRole}
         className="space-y-3"
       >
-        {error && (
+        {/* {error && (
           <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-2.5">
             <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-300" />
 
             <p className="text-xs text-red-200">{error}</p>
           </div>
-        )}
+        )} */}
 
         {/* ROLE INFORMATION */}
 

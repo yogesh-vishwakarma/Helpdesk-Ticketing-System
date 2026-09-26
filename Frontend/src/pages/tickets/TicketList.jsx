@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import {
   AlertCircle,
@@ -24,6 +25,10 @@ import Toast from "../../Components/TicketDetails/Toast";
 function TicketList() {
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
+
+  const user = useSelector((state) => state.auth.user);
+
+  const canSeeCustomer = user?.role !== "Customer";
 
   /* ================= PERMISSIONS ================= */
   const canViewAll = hasPermission("TICKET_VIEW_ALL");
@@ -608,6 +613,7 @@ function TicketList() {
                 canDelete={canDeleteTicket}
                 canUpdateStatus={canUpdateStatus}
                 canUpdatePriority={canUpdatePriority}
+                canSeeCustomer={canSeeCustomer}
               />
             </div>
           </div>

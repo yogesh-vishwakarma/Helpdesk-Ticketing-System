@@ -12,6 +12,7 @@ function TicketRow({
   onAssign,
   onDelete,
   canSeeAssignedAgent,
+  canSeeCustomer,
   canAssign,
   canUpdate,
   canDelete,
@@ -34,7 +35,27 @@ function TicketRow({
         </div>
       </td>
 
-      <td className="px-5 py-4">
+      {canSeeCustomer && (
+        <td className="px-5 py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-300 ring-1 ring-emerald-400/20">
+              {getInitial(ticket.customer?.name)}
+            </div>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-200">
+                {ticket.customer?.name || "Unknown"}
+              </p>
+
+              <p className="mt-0.5 max-w-[180px] truncate text-xs text-slate-500">
+                {ticket.customer?.email || "-"}
+              </p>
+            </div>
+          </div>
+        </td>
+      )}
+
+      {/* <td className="px-5 py-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-xs font-bold text-emerald-300 ring-1 ring-emerald-400/20">
             {getInitial(ticket.customer?.name)}
@@ -48,7 +69,7 @@ function TicketRow({
             </p>
           </div>
         </div>
-      </td>
+      </td> */}
 
       <td className="px-5 py-4">
         <span className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-slate-300 shadow-sm">
@@ -94,10 +115,7 @@ function TicketRow({
       {/* ============ ACTIONS — tighter padding & gap ============ */}
       <td className="whitespace-nowrap px-3 py-4">
         <div className="flex justify-end gap-1.5">
-          <ActionButton
-            onClick={() => onView(ticket)}
-            icon={<Eye size={15} />}
-          >
+          <ActionButton onClick={() => onView(ticket)} icon={<Eye size={15} />}>
             View
           </ActionButton>
 
