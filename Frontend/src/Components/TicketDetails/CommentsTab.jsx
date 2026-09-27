@@ -37,9 +37,7 @@ const CommentsTab = ({
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-xs font-bold text-white shadow-sm ring-1 ring-emerald-400/30">
-                    {item.author?.name
-                      ?.charAt(0)
-                      ?.toUpperCase() || "U"}
+                    {item.author?.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
 
                   <div className="min-w-0">
@@ -55,16 +53,33 @@ const CommentsTab = ({
                   </div>
                 </div>
 
-                <span className="shrink-0 rounded-full bg-white/[0.04] px-2 py-0.5 text-[10px] font-bold text-slate-500">
-                  #{paginatedComments.length - index}
+                <span className="shrink-0 text-[10px] font-medium text-slate-500">
+                  {item.createdAt
+                    ? (() => {
+                        const diff = Math.floor(
+                          (Date.now() - new Date(item.createdAt).getTime()) /
+                            1000,
+                        );
+
+                        if (diff < 60) return "Just now";
+                        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+                        if (diff < 86400)
+                          return `${Math.floor(diff / 3600)}h ago`;
+                        if (diff < 604800)
+                          return `${Math.floor(diff / 86400)}d ago`;
+
+                        return new Date(item.createdAt).toLocaleDateString();
+                      })()
+                    : ""}
                 </span>
+
+                {/* <span className="shrink-0 rounded-full bg-white/[0.04] px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                  #{paginatedComments.length - index}
+                </span> */}
               </div>
 
               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-300">
-                {item.message ||
-                  item.content ||
-                  item.comment ||
-                  ""}
+                {item.message || item.content || item.comment || ""}
               </p>
             </div>
           ))}
@@ -74,13 +89,9 @@ const CommentsTab = ({
           <Pagination
             page={commentPage}
             totalPages={totalCommentPages}
-            onPrevious={() =>
-              setCommentPage((p) => Math.max(p - 1, 1))
-            }
+            onPrevious={() => setCommentPage((p) => Math.max(p - 1, 1))}
             onNext={() =>
-              setCommentPage((p) =>
-                Math.min(p + 1, totalCommentPages),
-              )
+              setCommentPage((p) => Math.min(p + 1, totalCommentPages))
             }
           />
         )}
@@ -93,13 +104,9 @@ const CommentsTab = ({
         className="mt-4 border-t border-white/[0.06] pt-4"
       >
         <div className="mb-2.5 flex items-center justify-between">
-          <label className="text-sm font-bold text-white">
-            Add Comment
-          </label>
+          <label className="text-sm font-bold text-white">Add Comment</label>
 
-          <span className="text-[11px] text-slate-500">
-            Share an update
-          </span>
+          <span className="text-[11px] text-slate-500">Share an update</span>
         </div>
 
         <textarea
@@ -117,9 +124,7 @@ const CommentsTab = ({
             className="inline-flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-400 hover:to-teal-500 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
           >
             <Send size={15} />
-            {submittingComment
-              ? "Adding..."
-              : "Add Comment"}
+            {submittingComment ? "Adding..." : "Add Comment"}
           </button>
         </div>
       </form>
@@ -128,4 +133,3 @@ const CommentsTab = ({
 );
 
 export default CommentsTab;
-
